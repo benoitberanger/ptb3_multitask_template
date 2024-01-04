@@ -17,7 +17,7 @@ classdef Logger < handle
     end % meths
 
     properties(GetAccess = public, SetAccess = public)
-        padding (1,1) double {mustBeInteger, mustBeNonnegative} = 20;
+        padding (1,1) double {mustBeInteger, mustBeNonnegative} = 30;
     end % props
 
     methods(Access = public)
@@ -67,8 +67,9 @@ classdef Logger < handle
     methods (Static, Access = private)
 
         function str = getCaller()
-            stack = dbstack();
-            str = stack(4).name;
+            stack = dbstack(3,'-completenames');
+            str = strrep(stack(1).file, UTILS.GET.RootDir(),'');
+            str = str(2:end); % remove the first `filesep`
         end
 
         function str = getTimeStamp()
