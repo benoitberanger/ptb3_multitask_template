@@ -67,6 +67,7 @@ else % Create the figure
     base_cfg_pushbutton  = {'Units', 'Normalized', 'BackgroundColor',buttonBGcolor, 'Style','pushbutton' };
     base_cfg_radiobutton = {'Units', 'Normalized', 'BackgroundColor',figureBGcolor, 'Style','radiobutton'};
     base_cfg_listbox     = {'Units', 'Normalized', 'BackgroundColor',editBGcolor  , 'Style','listbox'    };
+    base_cfg_checkbox    = {'Units', 'Normalized', 'BackgroundColor',figureBGcolor, 'Style','checkbox'   };
 
 
 
@@ -186,6 +187,14 @@ else % Create the figure
     handles.listbox_Screens = uicontrol(where, base_cfg_listbox{:}, ...
         'String','', 'Position',[0.05 0.05 0.30 0.80], ...
         'CreateFcn',@GUI.VIEW.listbox_Screens_CreateFcn);
+
+    handles.checkbox_windowed = uicontrol(where, base_cfg_checkbox{:}, ...
+        'String','Windowed mode', 'Position',[0.50 0.70 0.70 0.30], ...
+        'Tooltip','Not full screen. Useful for single screen debugging (like laptop)');
+
+    handles.checkbox_transparent = uicontrol(where, base_cfg_checkbox{:}, ...
+        'String','Transparent', 'Position',[0.50 0.30 0.70 0.30], ...
+        'Tooltip','Transparent window. Useful for single screen debugging (like laptop)');
 
 
     %% End of opening
