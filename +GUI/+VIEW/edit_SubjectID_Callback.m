@@ -1,4 +1,4 @@
-function edit_SubjectID(hObject, ~)
+function edit_SubjectID_Callback(hObject, ~)
 logger = getLogger();
 
 MinNrChar = 3;

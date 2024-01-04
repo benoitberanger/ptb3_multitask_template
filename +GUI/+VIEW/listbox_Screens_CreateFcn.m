@@ -1,4 +1,4 @@
-function listbox_Screens(hObject , ~)
+function listbox_Screens_CreateFcn(hObject , ~)
 
 AvailableScreens = Screen('Screens')'; % make it column vector
 AvailableScreens = flip(AvailableScreens); % flip it so it appears in descending order

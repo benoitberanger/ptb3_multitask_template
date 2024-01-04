@@ -117,7 +117,7 @@ else % Create the figure
 
     handles.edit_SubjectID = uicontrol(where, base_cfg_edit{:}, ...
         'String','', 'Position',[0.00 0.00 1.00 1.00], ...
-        'Callback',@GUI.VIEW.Callback.edit_SubjectID);
+        'Callback',@GUI.VIEW.edit_SubjectID_Callback);
 
 
     %% Panel : Mode
@@ -183,10 +183,9 @@ else % Create the figure
     handles.text_screenid = uicontrol(where, base_cfg_text{:}, ...
         'String','Screen ID', 'Position',[0.05 0.85 0.30 0.10]);
 
-    handles.listbox_screens = uicontrol(where, base_cfg_listbox{:}, ...
+    handles.listbox_Screens = uicontrol(where, base_cfg_listbox{:}, ...
         'String','', 'Position',[0.05 0.05 0.30 0.80], ...
-        'CreateFcn',@GUI.VIEW.CreateFcn.listbox_Screens);
-
+        'CreateFcn',@GUI.VIEW.listbox_Screens_CreateFcn);
 
 
     %% End of opening
