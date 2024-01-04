@@ -1,6 +1,6 @@
 function CheckRequirements()
 % perform all installation checks
-logger = UTILS.Logger.get();
+logger = getLogger();
 
 logger.assert( ~isempty(which('PsychtoolboxRoot')), '"PsychtoolboxRoot" not found : check Psychtooblox installation => http://psychtoolbox.org/' )
 

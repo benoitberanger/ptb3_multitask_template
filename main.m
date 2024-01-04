@@ -4,7 +4,7 @@ function main()
 clc
 
 % get logger instance
-logger = UTILS.Logger.get();
+logger = getLogger();
 
 % make sure to stay in the current directory
 project_dir = fileparts(mfilename('fullpath')); % "fileparts" first output is the dir of the input
@@ -14,8 +14,7 @@ logger.log('Project name = %s', CONFIG.project_name() );
 logger.log('Project path = %s', project_dir);
 
 UTILS.CheckRequirements()
-
-logger.log('Starting (or focussing) GUI... \n');
-GUI.VIEW.OpenGUI(); % the GUI is the **ONLY** interface the user will interact with
+CONFIG.PrintReminder()
+GUI.VIEW.OpenGUI() % the GUI is the **ONLY** interface the user will interact with
 
 end % function
