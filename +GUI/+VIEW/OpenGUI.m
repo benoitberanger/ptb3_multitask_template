@@ -5,7 +5,7 @@ function varargout = OpenGUI()
 
 logger = getLogger();
 
-logger.log('Starting (or focussing) GUI... \n');
+logger.log('Starting (or focussing) GUI...');
 
 % debug=1 closes previous figure and reopens it, and send the gui handles
 % to base workspace.
@@ -70,7 +70,6 @@ else % Create the figure
     base_cfg_checkbox    = {'Units', 'Normalized', 'BackgroundColor',figureBGcolor, 'Style','checkbox'   };
 
 
-
     %% Main pannels
 
     handles.uipanel_perma_cfg = uipanel(handles.(gui_name), base_cfg_panel{:}, ...
@@ -85,31 +84,15 @@ else % Create the figure
     where = handles.uipanel_perma_cfg;
 
     % first line
-
-    handles.uipanel_sid = uipanel(where, base_cfg_panel{:}, ...
-        'Title','Subject ID', 'Position',[0.00 0.80 1.00 0.20]);
-
+    handles.uipanel_sid     = uipanel      (where, 'Position',[0.00 0.80 1.00 0.20], base_cfg_panel{:}, 'Title','Subject ID'   );
     % second line
-
-    handles.uipanel_mode = uibuttongroup(where, base_cfg_panel{:}, ...
-        'Title','ACQ mode', 'Position',[0.00 0.50 0.25 0.30]);
-
-    handles.uipanel_save = uibuttongroup(where, base_cfg_panel{:}, ...
-        'Title','Save', 'Position',[0.25 0.50 0.25 0.30]);
-
-    handles.uipanel_kb = uibuttongroup(where, base_cfg_panel{:}, ...
-        'Title','Keybind', 'Position',[0.50 0.50 0.25 0.30]);
-
-    handles.uipanel_parport = uibuttongroup(where, base_cfg_panel{:}, ...
-        'Title','Parallel port', 'Position',[0.75 0.50 0.25 0.30]);
-
+    handles.uipanel_mode    = uibuttongroup(where, 'Position',[0.00 0.50 0.25 0.30], base_cfg_panel{:}, 'Title','ACQ mode'     );
+    handles.uipanel_save    = uibuttongroup(where, 'Position',[0.25 0.50 0.25 0.30], base_cfg_panel{:}, 'Title','Save'         );
+    handles.uipanel_kb      = uibuttongroup(where, 'Position',[0.50 0.50 0.25 0.30], base_cfg_panel{:}, 'Title','Keybind'      );
+    handles.uipanel_parport = uibuttongroup(where, 'Position',[0.75 0.50 0.25 0.30], base_cfg_panel{:}, 'Title','Parallel port');
     % third line
-
-    handles.uipanel_screen = uipanel(where, base_cfg_panel{:}, ...
-        'Title','Screen', 'Position',[0.00 0.00 0.50 0.50]);
-
-    handles.uipanel_eyelink = uipanel(where, base_cfg_panel{:}, ...
-        'Title','Eyelink', 'Position',[0.50 0.00 0.50 0.50]);
+    handles.uipanel_screen  = uipanel      (where, 'Position',[0.00 0.00 0.40 0.50], base_cfg_panel{:}, 'Title','Screen'       );
+    handles.uipanel_eyelink = uibuttongroup(where, 'Position',[0.40 0.00 0.60 0.50], base_cfg_panel{:}, 'Title','Eyelink'      );
 
 
     %% Panel : Subject ID
@@ -176,6 +159,13 @@ else % Create the figure
         'String','No', 'Position',[0.05 0.00 0.90 0.50],...
         'Tooltip','');
 
+    result = GUI.VIEW.IsOpenParPortPortDetected();
+    if ~result
+        where.SelectedObject = handles.radiobutton_pp_no;
+        handles.radiobutton_pp_yes.Visible = 'off';
+        logger.err('Parallel port GUI option disabled')
+    end
+
 
     %% Panel : Screen
 
@@ -189,13 +179,29 @@ else % Create the figure
         'CreateFcn',@GUI.VIEW.listbox_Screens_CreateFcn);
 
     handles.checkbox_windowed = uicontrol(where, base_cfg_checkbox{:}, ...
-        'String','Windowed mode', 'Position',[0.50 0.70 0.70 0.30], ...
+        'String','Windowed mode', 'Position',[0.40 0.70 0.70 0.30], ...
         'Tooltip','Not full screen. Useful for single screen debugging (like laptop)');
 
     handles.checkbox_transparent = uicontrol(where, base_cfg_checkbox{:}, ...
-        'String','Transparent', 'Position',[0.50 0.30 0.70 0.30], ...
+        'String','Transparent', 'Position',[0.40 0.30 0.70 0.30], ...
         'Tooltip','Transparent window. Useful for single screen debugging (like laptop)');
 
+
+    %% Panel : Eyelink
+
+    where = handles.uipanel_eyelink;
+    where.SelectionChangedFcn = @GUI.VIEW.uipanel_eyelink_SelectionChangedFcn;
+
+    handles.radiobutton_eyelink_yes = uicontrol(where, base_cfg_radiobutton{:}, ...
+        'String','Yes', 'Position',[0.05 0.50 0.15 0.50],...
+        'Tooltip', '');
+
+    handles.radiobutton_eyelink_no = uicontrol(where, base_cfg_radiobutton{:}, ...
+        'String','No', 'Position',[0.05 0.00 0.15 0.50],...
+        'Tooltip','');
+
+    handles.uipanel_eyelink_buttons = uipanel(where, base_cfg_panel{:},...
+        'Title','', 'Position',[0.20 0.00 0.75 1.00]);
 
     %% End of opening
 

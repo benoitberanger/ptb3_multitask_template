@@ -10,7 +10,7 @@ if length(id_str) < MinNrChar
     logger.err('SubjectID must be at least %d chars', MinNrChar)
 else
     logger.ok('SubjectID     = %s', id_str)
-    logger.ok('SubjectID dir = %s', UTILS.GET.SubjectDataDir(id_str))
+    logger.log('SubjectID dir = %s', UTILS.GET.SubjectDataDir(id_str))
 end
 
 end % function
