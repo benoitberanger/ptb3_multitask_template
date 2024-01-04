@@ -4,19 +4,19 @@ function main()
 clc
 
 % get logger instance
-lgr = utils.logger.get();
+logger = UTILS.Logger.get();
 
 % make sure to stay in the current directory
 project_dir = fileparts(mfilename('fullpath')); % "fileparts" first output is the dir of the input
 cd(project_dir); % just to make sure we are in the right dir
 
-lgr.log('Project name = %s', config.project_name() );
-lgr.log('Project path = %s', project_dir);
+logger.log('Project name = %s', CONFIG.project_name() );
+logger.log('Project path = %s', project_dir);
 
-config.CheckRequirements()
+CONFIG.CheckRequirements()
 
-lgr.log('Starting (or focussing) GUI... \n');
-gui.view.OpenGUI(); % the GUI is the **ONLY** interface the user will interact with
+logger.log('Starting (or focussing) GUI... \n');
+GUI.VIEW.OpenGUI(); % the GUI is the **ONLY** interface the user will interact with
 
 % NOTES:
 %

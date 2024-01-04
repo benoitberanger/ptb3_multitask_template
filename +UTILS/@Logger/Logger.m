@@ -1,5 +1,5 @@
-classdef logger < handle
-    % Singleton class, only accessed using `logger = utils.logger.get()`
+classdef Logger < handle
+    % Singleton class, only accessed using `logger = UTILS.Logger.get()`
     % the end user will only be interesed in the "public" part
 
 
@@ -8,10 +8,10 @@ classdef logger < handle
     methods(Static, Access = public)
 
         function self = getInstance()
-            self = utils.logger.get();
+            self = UTILS.Logger.get();
         end % fcn
         function self = get() % shortcur
-            self = utils.logger.instance;
+            self = UTILS.Logger.instance;
         end % fcn
 
     end % meths
@@ -44,7 +44,7 @@ classdef logger < handle
     %% private
 
     properties(Constant, Access = private)
-        instance (1,1) utils.logger = utils.logger()
+        instance (1,1) UTILS.Logger = UTILS.Logger()
     end % props
 
     properties(Constant, Access = public)
@@ -53,7 +53,7 @@ classdef logger < handle
 
     methods (Access = private)
 
-        function self = logger() % constructor
+        function self = Logger() % constructor
             % pass
         end
 
