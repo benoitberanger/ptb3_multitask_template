@@ -72,7 +72,8 @@ classdef Logger < handle
 
         function str = FormatMessage(self, formatted_char, varargin)
             msg = sprintf(formatted_char, varargin{:});
-            str = sprintf(sprintf('[%s - %-*s] %s', self.getTimeStamp(), self.padding, self.getCaller(), msg));
+            str = sprintf('[%s - %-*s] %s', self.getTimeStamp(), self.padding, self.getCaller(), msg);
+            str = strrep(str,'\','\\');
         end
 
     end % meths
