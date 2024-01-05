@@ -179,12 +179,16 @@ else % Create the figure
         'CreateFcn',@GUI.VIEW.listbox_Screens_CreateFcn);
 
     handles.checkbox_windowed = uicontrol(where, base_cfg_checkbox{:}, ...
-        'String','Windowed mode', 'Position',[0.40 0.70 0.70 0.30], ...
+        'String','Windowed mode', 'Position',[0.40 0.66 0.70 0.33], ...
         'Tooltip','Not full screen. Useful for single screen debugging (like laptop)');
 
     handles.checkbox_transparent = uicontrol(where, base_cfg_checkbox{:}, ...
-        'String','Transparent', 'Position',[0.40 0.30 0.70 0.30], ...
+        'String','Transparent', 'Position',[0.40 0.33 0.70 0.33], ...
         'Tooltip','Transparent window. Useful for single screen debugging (like laptop)');
+
+    handles.checkbox_recordmovie = uicontrol(where, base_cfg_checkbox{:}, ...
+        'String','Record movie', 'Position',[0.40 0.00 0.70 0.33], ...
+        'Tooltip','Record the screen into a movie, and save it to the disk.');
 
 
     %% Panel : Eyelink
@@ -201,7 +205,7 @@ else % Create the figure
         'Tooltip','');
 
     handles.uipanel_eyelink_buttons = uipanel(where, base_cfg_panel{:},...
-        'Title','', 'Position',[0.20 0.00 0.75 1.00]);
+        'Title','', 'Position',[0.20 0.00 0.80 1.00]);
 
     where = handles.uipanel_eyelink_buttons;
 
@@ -210,7 +214,7 @@ else % Create the figure
     handles.pushbutton_eyelink_isconnected   = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.33 0.50 0.33 0.50], 'String','IsConnected'  , 'Callback', @GUI.VIEW.pushbutton_eyelink_isconnected_Callback  );
     handles.pushbutton_eyelink_calibration   = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.66 0.50 0.33 0.50], 'String','Calibration'  , 'Callback', @GUI.VIEW.pushbutton_eyelink_calibration_Callback  );
     % second line
-    handles.pushbutton_eyelink_downloadfiles = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.00 0.00 0.33 0.50], 'String','DownloadFiles', 'Callback', @GUI.VIEW.pushbutton_eyelink_downloadfiles_Callback);
+    handles.pushbutton_eyelink_downloadfiles = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.00 0.00 0.66 0.50], 'String','DownloadFiles', 'Callback', @GUI.VIEW.pushbutton_eyelink_downloadfiles_Callback);
     handles.pushbutton_eyelink_forcereset    = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.66 0.00 0.33 0.50], 'String','ForceReset   ', 'Callback', @GUI.VIEW.pushbutton_eyelink_forcereset_Callback   );
 
 
