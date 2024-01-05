@@ -15,6 +15,6 @@ logger.log('Project path = %s', project_dir);
 
 UTILS.CheckRequirements()
 CONFIG.PrintReminder()
-GUI.VIEW.OpenGUI() % the GUI is the **ONLY** interface the user will interact with
+GUI.Open() % the GUI is the **ONLY** interface the user will interact with
 
 end % function

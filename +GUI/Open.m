@@ -1,4 +1,4 @@
-function varargout = OpenGUI()
+function varargout = Open()
 % OpenGUI is the function that creates (or bring to focus) gui.
 % Then, CORE.Workflow() is always called to start each task. It is the
 % "main" program.
@@ -27,7 +27,7 @@ if ~isempty(figPtr) % Figure exists so brings it to the focus
     if debug
         clc %#ok<UNRCH>
         close(figPtr);
-        GUI.VIEW.OpenGUI();
+        GUI.Open();
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -203,6 +203,105 @@ else % Create the figure
     handles.uipanel_eyelink_buttons = uipanel(where, base_cfg_panel{:},...
         'Title','', 'Position',[0.20 0.00 0.75 1.00]);
 
+    where = handles.uipanel_eyelink_buttons;
+
+    % first line
+    handles.pushbutton_eyelink_initialize    = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.00 0.50 0.33 0.50], 'String','Initialize'   , 'Callback', @GUI.VIEW.pushbutton_eyelink_initialize_Callback   );
+    handles.pushbutton_eyelink_isconnected   = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.33 0.50 0.33 0.50], 'String','IsConnected'  , 'Callback', @GUI.VIEW.pushbutton_eyelink_isconnected_Callback  );
+    handles.pushbutton_eyelink_calibration   = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.66 0.50 0.33 0.50], 'String','Calibration'  , 'Callback', @GUI.VIEW.pushbutton_eyelink_calibration_Callback  );
+    % second line
+    handles.pushbutton_eyelink_downloadfiles = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.00 0.00 0.33 0.50], 'String','DownloadFiles', 'Callback', @GUI.VIEW.pushbutton_eyelink_downloadfiles_Callback);
+    handles.pushbutton_eyelink_forcereset    = uicontrol(where, base_cfg_pushbutton{:}, 'Position',[0.66 0.00 0.33 0.50], 'String','ForceReset   ', 'Callback', @GUI.VIEW.pushbutton_eyelink_forcereset_Callback   );
+
+
+    %% Panel : Task
+
+    %----------------------------------------------------------------------
+    %
+
+    %     PanelDispatcher.next();
+    %     handles.uipanel_Task = uibuttongroup(handles.(gui_name),...
+    %         'Title','Task',...
+    %         'Units', 'Normalized',...
+    %         'Position',PanelDispatcher.pos(),...
+    %         'BackgroundColor',figureBGcolor);
+
+    %     TaskList = gui.MODEL.getTaskList();
+    %     TaskVect = ones([1 length(TaskList)]);
+    %
+    %     o_task = GUI.VIEW.ObjectDispatcher( TaskVect, [], 3);
+    %
+    %     for i = 1 : length(TaskList)
+    %
+    %         o_task.next();
+    %
+    %         b_task.x   = o_task.xpos;
+    %         b_task.w   = o_task.xwidth;
+    %         b_task.y   = o_task.ypos;
+    %         b_task.h   = o_task.ywidth;
+    %         b_task.tag = sprintf('pushbutton_%s', TaskList{i});
+    %         handles.(b_task.tag) = uicontrol(handles.uipanel_Task       ,...
+    %             'Style'          , 'pushbutton'                         ,...
+    %             'Units'          , 'Normalized'                         ,...
+    %             'Position'       , [b_task.x b_task.y b_task.w b_task.h],...
+    %             'String'         , TaskList{i}                          ,...
+    %             'BackgroundColor', buttonBGcolor                        ,...
+    %             'Tag'            , b_task.tag                           ,...
+    %             'Callback'       , @gui.MODEL.Core                      );
+    %
+    %     end
+
+
+
+    %% Panel : record movie
+
+    %     PanelDispatcher.next();
+    %     handles.uipanel_Movie = uibuttongroup(handles.(gui_name),...
+    %         'Title','Movie recording',...
+    %         'Units', 'Normalized',...
+    %         'Position',PanelDispatcher.pos(),...
+    %         'BackgroundColor',figureBGcolor);
+
+    %     o_movie = GUI.VIEW.ObjectDispatcher( [1 1] , 0.25 );
+    %
+    %     % ---------------------------------------------------------------------
+    %     % RadioButton : 0
+    %
+    %     o_movie.next();
+    %     r_movie_off.x   = o_movie.xpos;
+    %     r_movie_off.y   = 0.1 ;
+    %     r_movie_off.w   = p_movie.w;
+    %     r_movie_off.h   = 0.8;
+    %     r_movie_off.tag = 'radiobutton_movie_0';
+    %     handles.(r_movie_off.tag) = uicontrol(handles.uipanel_Movie,...
+    %         'Style','radiobutton'                             ,...
+    %         'Units', 'Normalized'                             ,...
+    %         'Position',[r_movie_off.x r_movie_off.y r_movie_off.w r_movie_off.h],...
+    %         'String','Off       '                             ,...
+    %         'HorizontalAlignment','Center'                    ,...
+    %         'Tag',r_movie_off.tag                             ,...
+    %         'BackgroundColor',figureBGcolor                   );
+    %
+    %
+    %     % ---------------------------------------------------------------------
+    %     % RadioButton : 1
+    %
+    %     o_movie.next();
+    %     r_movie_on.x   = o_movie.xpos;
+    %     r_movie_on.y   = 0.1 ;
+    %     r_movie_on.w   = p_movie.w;
+    %     r_movie_on.h   = 0.8;
+    %     r_movie_on.tag = 'radiobutton_movie_1';
+    %     handles.(r_movie_on.tag) = uicontrol(handles.uipanel_Movie,...
+    %         'Style','radiobutton'                               ,...
+    %         'Units', 'Normalized'                               ,...
+    %         'Position',[r_movie_on.x r_movie_on.y r_movie_on.w r_movie_on.h],...
+    %         'String','On'                                       ,...
+    %         'HorizontalAlignment','Center'                      ,...
+    %         'Tag',r_movie_on.tag                                ,...
+    %         'BackgroundColor',figureBGcolor                     );
+
+
     %% End of opening
 
     % IMPORTANT
@@ -210,12 +309,6 @@ else % Create the figure
     % After creating the figure, dont forget the line
     % guidata(figHandle,handles) . It allows smart retrive like
     % handles=guidata(hObject)
-
-    % Init with EYELINK Off
-    %     set(handles.uipanel_EyelinkMode,'SelectedObject',handles.radiobutton_Eyelink_0)
-    %     eventdata.NewValue = handles.radiobutton_Eyelink_0;
-    %     GUI.VIEW.SelectionChangeFcn.uipanel_EyelinkMode(handles.uipanel_EyelinkMode, eventdata)
-
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% DEBUG %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if debug
