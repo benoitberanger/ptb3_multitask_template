@@ -11,7 +11,7 @@ logger.log('Starting (or focussing) GUI...');
 % to base workspace.
 debug = 0;
 
-gui_name = [ 'GUI_' CONFIG.project_name() ];
+gui_name = [ 'GUI_' CONFIG.ProjectName() ];
 
 
 %% Open a singleton figure, or focus on it.

@@ -11,11 +11,11 @@ rng('shuffle')
 logger = getLogger();
 
 % make sure to stay in the current directory
-project_dir = fileparts(mfilename('fullpath')); % "fileparts" first output is the dir of the input
-cd(project_dir); % just to make sure we are in the right dir
+project_dir = UTILS.GET.RootDir();
+cd(project_dir);
 
 % print some info
-logger.log('Project name = %s', CONFIG.project_name() );
+logger.log('Project name = %s', CONFIG.ProjectName() );
 logger.log('Project path = %s', project_dir);
 
 % lets go

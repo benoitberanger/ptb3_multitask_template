@@ -26,6 +26,9 @@ handles = guidata( hObject );
 
 global S
 S                 = struct; % S is the main structure, containing everything useful, and used everywhere
+S.ProjectName     = CONFIG.ProjectName();
+S.ProjectRootDir  = UTILS.GET.RootDir();
+S.ProjectDataDir  = UTILS.GET.DataDir();
 S.TimeStampSimple = datestr(now, 'yyyy-mm-dd HH:MM'); % readable
 S.TimeStampFile   = datestr(now, 30                ); % yyyymmddTHHMMSS : to sort automatically by time of creation
 
@@ -43,6 +46,25 @@ S.Transparent = GUI.GET.Transparent( handles );
 S.RecordMovie = GUI.GET.RecordMovie( handles );
 S.Eyelink     = GUI.GET.Eyelink    ( handles );
 S.Task        = GUI.GET.Task       ( hObject );
+
+
+%% SubjectID & where to store the data
+
+if isempty(S.SubjectID)
+    logger.err('SubjectID is empty')
+    return
+end
+
+S.SubjectDataDir = UTILS.GET.SubjectDataDir(S.SubjectID);
+
+%% Generate base output filepath
+
+basename_norun = sprintf('%s_%s', S.SubjectID, S.Task );
+[S.RunName, S.RunNumber] = UTILS.GET.AppendRunNumber(S.SubjectDataDir, basename_norun);
+
+S.OutFilename = sprintf('%s_%s', S.TimeStampFile, S.RunName);
+S.OutFilpath  = fullfile(S.SubjectDataDir, S.OutFilename);
+
 
 S
 end % fcn
