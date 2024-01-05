@@ -1,6 +1,6 @@
 classdef ObjectDispatcher < handle
 
-    
+
     properties
 
         inputVect     (:,1) double
@@ -20,7 +20,7 @@ classdef ObjectDispatcher < handle
 
     end % props
 
-    
+
     methods
 
         %------------------------------------------------------------------

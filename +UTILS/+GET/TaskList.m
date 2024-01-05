@@ -2,6 +2,8 @@ function tasklist = TaskList()
 % To add a task, add a package dir like this : ./+TASK/+<MyNewTask>
 % HOWEVER : do not use all uppercase name -> they will be discarded, such as ./+TASK/+<MYNEWTASK>
 
+logger = getLogger();
+
 task_folder = './+TASK';
 
 d = dir(fullfile(task_folder,'+*'));
@@ -13,5 +15,9 @@ raw = regexprep(dirname, '\+', ''); % remove the + at the begining
 TaskList_upper = upper(raw);
 Task_idx = ~strcmp(TaskList_upper, raw);
 tasklist = raw(Task_idx);
+
+if isempty(tasklist)
+    logger.err('Empty task list')
+end
 
 end % fcn
