@@ -9,7 +9,7 @@ logger.log('Starting (or focussing) GUI...');
 
 % debug=1 closes previous figure and reopens it, and send the gui handles
 % to base workspace.
-debug = 1;
+debug = 0;
 
 gui_name = [ 'GUI_' CONFIG.project_name() ];
 
@@ -220,90 +220,19 @@ else % Create the figure
 
     %% Panel : Task
 
-    %----------------------------------------------------------------------
-    %
+    where = handles.uipanel_task;
 
-    %     PanelDispatcher.next();
-    %     handles.uipanel_Task = uibuttongroup(handles.(gui_name),...
-    %         'Title','Task',...
-    %         'Units', 'Normalized',...
-    %         'Position',PanelDispatcher.pos(),...
-    %         'BackgroundColor',figureBGcolor);
+    tasklist = UTILS.GET.TaskList();
 
-    %     TaskList = gui.MODEL.getTaskList();
-    %     TaskVect = ones([1 length(TaskList)]);
-    %
-    %     o_task = GUI.VIEW.ObjectDispatcher( TaskVect, [], 3);
-    %
-    %     for i = 1 : length(TaskList)
-    %
-    %         o_task.next();
-    %
-    %         b_task.x   = o_task.xpos;
-    %         b_task.w   = o_task.xwidth;
-    %         b_task.y   = o_task.ypos;
-    %         b_task.h   = o_task.ywidth;
-    %         b_task.tag = sprintf('pushbutton_%s', TaskList{i});
-    %         handles.(b_task.tag) = uicontrol(handles.uipanel_Task       ,...
-    %             'Style'          , 'pushbutton'                         ,...
-    %             'Units'          , 'Normalized'                         ,...
-    %             'Position'       , [b_task.x b_task.y b_task.w b_task.h],...
-    %             'String'         , TaskList{i}                          ,...
-    %             'BackgroundColor', buttonBGcolor                        ,...
-    %             'Tag'            , b_task.tag                           ,...
-    %             'Callback'       , @gui.MODEL.Core                      );
-    %
-    %     end
+    nObjPerRow = 2;
+    task_dispatcher = GUI.VIEW.ObjectDispatcher(ones(size(tasklist)), nObjPerRow);
 
-
-
-    %% Panel : record movie
-
-    %     PanelDispatcher.next();
-    %     handles.uipanel_Movie = uibuttongroup(handles.(gui_name),...
-    %         'Title','Movie recording',...
-    %         'Units', 'Normalized',...
-    %         'Position',PanelDispatcher.pos(),...
-    %         'BackgroundColor',figureBGcolor);
-
-    %     o_movie = GUI.VIEW.ObjectDispatcher( [1 1] , 0.25 );
-    %
-    %     % ---------------------------------------------------------------------
-    %     % RadioButton : 0
-    %
-    %     o_movie.next();
-    %     r_movie_off.x   = o_movie.xpos;
-    %     r_movie_off.y   = 0.1 ;
-    %     r_movie_off.w   = p_movie.w;
-    %     r_movie_off.h   = 0.8;
-    %     r_movie_off.tag = 'radiobutton_movie_0';
-    %     handles.(r_movie_off.tag) = uicontrol(handles.uipanel_Movie,...
-    %         'Style','radiobutton'                             ,...
-    %         'Units', 'Normalized'                             ,...
-    %         'Position',[r_movie_off.x r_movie_off.y r_movie_off.w r_movie_off.h],...
-    %         'String','Off       '                             ,...
-    %         'HorizontalAlignment','Center'                    ,...
-    %         'Tag',r_movie_off.tag                             ,...
-    %         'BackgroundColor',figureBGcolor                   );
-    %
-    %
-    %     % ---------------------------------------------------------------------
-    %     % RadioButton : 1
-    %
-    %     o_movie.next();
-    %     r_movie_on.x   = o_movie.xpos;
-    %     r_movie_on.y   = 0.1 ;
-    %     r_movie_on.w   = p_movie.w;
-    %     r_movie_on.h   = 0.8;
-    %     r_movie_on.tag = 'radiobutton_movie_1';
-    %     handles.(r_movie_on.tag) = uicontrol(handles.uipanel_Movie,...
-    %         'Style','radiobutton'                               ,...
-    %         'Units', 'Normalized'                               ,...
-    %         'Position',[r_movie_on.x r_movie_on.y r_movie_on.w r_movie_on.h],...
-    %         'String','On'                                       ,...
-    %         'HorizontalAlignment','Center'                      ,...
-    %         'Tag',r_movie_on.tag                                ,...
-    %         'BackgroundColor',figureBGcolor                     );
+    for i = 1 : length(tasklist)
+        task_dispatcher.next();
+        taskname = tasklist{i};
+        uiname = sprintf('pushbutton_task_%s', taskname);
+        handles.(uiname) = uicontrol(where, base_cfg_pushbutton{:}, 'Position',task_dispatcher.pos(), 'String',taskname, 'Callback', @WORKFLOW.Run);
+    end
 
 
     %% End of opening
@@ -314,6 +243,8 @@ else % Create the figure
     % guidata(figHandle,handles) . It allows smart retrive like
     % handles=guidata(hObject)
 
+    handles = guidata(figHandle);
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%% DEBUG %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if debug
         assignin('base','handles',handles) %#ok<UNRCH>
@@ -321,16 +252,14 @@ else % Create the figure
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    figPtr = figHandle;
-
 
 end % creation of figure
 
 if nargout > 0
-
-    varargout{1} = guidata(figPtr);
-
+    varargout{1} = handles;
 end
+
+logger.log('GUI ready');
 
 
 end % function
