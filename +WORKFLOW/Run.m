@@ -63,7 +63,7 @@ basename_norun = sprintf('%s_%s', S.SubjectID, S.Task );
 [S.RunName, S.RunNumber] = UTILS.GET.AppendRunNumber(S.SubjectDataDir, basename_norun);
 
 S.OutFilename = sprintf('%s_%s', S.TimeStampFile, S.RunName);
-S.OutFilpath  = fullfile(S.SubjectDataDir, S.OutFilename);
+S.OutFilepath = fullfile(S.SubjectDataDir, S.OutFilename);
 
 
 S
