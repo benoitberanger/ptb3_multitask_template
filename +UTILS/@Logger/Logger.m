@@ -30,18 +30,18 @@ classdef Logger < handle
         end% fcn
 
         function ok(self, formatted_char, varargin)
-            self.cprintf('Comments', self.FormatMessage([formatted_char '\n'], varargin{:}));
+            self.cprintf('Comments', '%s\n', self.FormatMessage(formatted_char, varargin{:}));
         end% fcn
 
         function warn(self, formatted_char, varargin)
-            self.cprintf('Keywords', self.FormatMessage([formatted_char '\n'], varargin{:}));
+            self.cprintf('Keywords', '%s\n', self.FormatMessage(formatted_char, varargin{:}));
         end% fcn
         function warning(self, formatted_char, varargin)
             warning(self.FormatMessage(formatted_char, varargin{:}));
         end% fcn
 
         function err(self, formatted_char, varargin)
-            self.cprintf('Errors', self.FormatMessage([formatted_char '\n'], varargin{:}));
+            self.cprintf('Errors', '%s\n', self.FormatMessage(formatted_char, varargin{:}));
         end% fcn
         function error(self, formatted_char, varargin)
             error(self.FormatMessage(formatted_char, varargin{:}));
@@ -73,7 +73,6 @@ classdef Logger < handle
         function str = FormatMessage(self, formatted_char, varargin)
             msg = sprintf(formatted_char, varargin{:});
             str = sprintf('[%s - %-*s] %s', self.getTimeStamp(), self.padding, self.getCaller(), msg);
-            str = strrep(str,'\','\\');
         end
 
     end % meths
