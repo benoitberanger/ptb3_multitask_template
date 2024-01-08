@@ -1,4 +1,4 @@
-function result = IsConnected()
+function [result, status]= IsConnected()
 logger = getLogger();
 
 status = Eyelink('IsConnected');
