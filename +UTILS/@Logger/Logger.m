@@ -60,6 +60,10 @@ classdef Logger < handle
         instance (1,1) UTILS.Logger = UTILS.Logger()
     end % props
 
+    properties(GetAccess = public, SetAccess = private)
+        last_msg (1,:) char         = '';
+    end % props
+
     properties(Constant, Access = public)
         creation (1,:) char         = datestr(now, 'yyyy-mm-dd HH:MM:ss')
     end % props
@@ -67,12 +71,13 @@ classdef Logger < handle
     methods (Access = private)
 
         function self = Logger() % constructor
-            % pass
+            self.warn('Logger class MUST NOT be used for real time logging. Use `fprintf` instead.')
         end
 
         function str = FormatMessage(self, formatted_char, varargin)
             msg = sprintf(formatted_char, varargin{:});
             str = sprintf('[%s - %-*s] %s', self.getTimeStamp(), self.padding, self.getCaller(), msg);
+            self.last_msg = str;
         end
 
     end % meths

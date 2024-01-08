@@ -12,6 +12,7 @@ function Run( hObject, ~ )
 
 clc
 sca
+rng('shuffle')
 logger = getLogger();
 
 
@@ -111,7 +112,8 @@ end
 
 %% Task
 
-% TASK.(S.Task).Runtime();
+logger.log('Calling TASK.%s.Runtime()', S.Task)
+TASK.(S.Task).Runtime();
 
 
 %% Save data 'raw' data immediatly
@@ -127,6 +129,11 @@ if S.Eyelink
     EYELINK.StopRecording();
     EYELINK.CloseFile();
 end
+
+
+%% Save post-processing files
+
+logger.err('Save post-processing files: TODO')
 
 
 %% Ready for another run
