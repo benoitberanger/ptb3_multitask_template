@@ -94,7 +94,16 @@ classdef Logger < handle
 
             % convert the package disk separator to the matlab script usage (easier copy-paste)
             str = strrep(str, [filesep '+'], '.');
-            str = strrep(str, filesep, '.');
+
+            % if its a class method, show it
+            idx = strfind(str, '@');
+            if idx
+                str = [str(1:idx)  stack(1).name];
+            else
+                idx = length(str);
+            end
+
+            str(1:idx) = strrep(str(1:idx), filesep, '.');
             str = strrep(str, '+', '');
         end
 
