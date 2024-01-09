@@ -8,7 +8,13 @@ classdef Window < handle
         % here is a list of "default" parameters :
 
         % user-depend settings
-        bg_color      (1,4) double  = [128 128 128 255]; % [R G B a], from 0 to 255
+        bg_color      (1,3) double  = [128 128 128]; % [R G B], from 0 to 255
+
+        % from the gui
+        screen_id           double % mandatory, you need to be set by the user
+        is_transparent(1,1) logical = false;
+        is_windowed   (1,1) logical = false;
+        is_recored    (1,1) logical = false;
 
         % my suggestion of useful settings
         anti_aliazing (1,1) double  = 4; % number of samples for multi-sample anti-aliazing
@@ -26,17 +32,17 @@ classdef Window < handle
         function Open(self)
             % paramters come from `global S` and default paramters (see above, in the Public)
 
-            global S
             logger = getLogger();
+            logger.log('Preparing PTB window')
             clear Screen % reset all cashed PTB screen settings
 
             % Transparent
-            if S.guiTransparent
+            if self.is_transparent
                 PsychDebugWindowConfiguration(self.opacity, self.opacity);
             end
 
             % Use GStreamer : for videos
-            if S.guiRecordMovie
+            if self.is_recored
                 Screen('Preference', 'OverrideMultimediaEngine', 1);
             end
 
@@ -44,8 +50,8 @@ classdef Window < handle
             Screen('Preference', 'VisualDebugLevel', 1);
 
             % Windowed
-            if S.guiWindowed
-                [ScreenWidth, ScreenHeight]=Screen('WindowSize', S.guiScreenID);
+            if self.is_windowed
+                [ScreenWidth, ScreenHeight]=Screen('WindowSize', self.screen_id);
                 SmallWindow = ScaleRect( [0 0 ScreenWidth ScreenHeight] , self.factor , self.factor );
                 WindowRect = CenterRectOnPoint( SmallWindow , ScreenWidth/2 , ScreenHeight/2 );
             else
@@ -53,7 +59,7 @@ classdef Window < handle
             end
 
             % Open
-            self.screen_id = S.guiScreenID;
+            logger.assert(~isempty(self.screen_id), 'screen_id must be set properly. See Screen(''Screens?'') ')
             try
                 [self.ptr,self.rect] = Screen('OpenWindow',self.screen_id,self.bg_color,WindowRect,[],[],[],self.anti_aliazing);
             catch err
@@ -66,7 +72,7 @@ classdef Window < handle
             [self.  size_x, self.  size_y] = RectSize  (self.rect);
             [self.center_x, self.center_y] = RectCenter(self.rect);
 
-
+            logger.log('PTB window & rendring paramters set')
         end % fcn
 
     end % props
@@ -76,7 +82,6 @@ classdef Window < handle
 
     properties(GetAccess = public, SetAccess = protected)
         % paramters setted after Open()
-        screen_id     (1,1) double
         ptr           (1,1) double
         rect          (1,4) double
         size_x        (1,1) double
