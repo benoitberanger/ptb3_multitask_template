@@ -1,10 +1,10 @@
-function [Planning, Parameters] = PrepareEvents(ACQmode)
+function [planning, cfgEvents] = PrepareEvents(ACQmode)
 
 if nargin < 1 % only to plot the paradigm when we execute the function outside of the main script
     ACQmode = 'Acquisition';
 end
 
-p = struct; % This structure will contain task specific parameters
+cfgEvents = struct; % This structure will contain task specific parameters
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,23 +13,23 @@ p = struct; % This structure will contain task specific parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% N-Back
 
-p.nBack      = [0 2]; % 0-back & 2-back
-p.nBlock     = 3;     % repetition of each x-back block
-p.catchRatio = 0.20;  % percentage of catch
-p.nCatch     = 5;     % catch items per block
+cfgEvents.nBack      = [0 2]; % 0-back & 2-back
+cfgEvents.nBlock     = 3;     % repetition of each x-back block
+cfgEvents.catchRatio = 0.20;  % percentage of catch
+cfgEvents.nCatch     = 5;     % catch items per block
 
-p.availLetter{1} = { 'B' 'N' 'D' 'Q' 'G' 'S' 'J' 'V' };
-p.availLetter{2} = { 'C' 'P' 'F' 'R' 'H' 'T' 'L'  };
+cfgEvents.availLetter{1} = { 'B' 'N' 'D' 'Q' 'G' 'S' 'J' 'V' };
+cfgEvents.availLetter{2} = { 'C' 'P' 'F' 'R' 'H' 'T' 'L'  };
 % this is seperated into 2 lists, to help psedo-random setup
 
 
 %% Timings
 
 % all in seconds
-p.durInstruction = 4.0;
-p.durStim        = 0.5;
-p.durDelay       = 1.5;
-p.durRest        = [7 8]; % [min max] for the jitter
+cfgEvents.durInstruction = 4.0;
+cfgEvents.durStim        = 0.5;
+cfgEvents.durDelay       = 1.5;
+cfgEvents.durRest        = [7 8]; % [min max] for the jitter
 
 
 %% Debugging
@@ -38,16 +38,16 @@ switch ACQmode
     case 'Acquisition'
         % pass
     case 'Debug'
-        p.nBlock     = 1;
-        p.nCatch     = 3;
-        p.durRest    = [1.0 1.0];
+        cfgEvents.nBlock     = 1;
+        cfgEvents.nCatch     = 3;
+        cfgEvents.durRest    = [1.0 1.0];
     case 'FastDebug'
-        p.nBlock     = 1;
-        p.nCatch     = 3;
-        p.durInstruction = 1.0;
-        p.durStim        = 0.2;
-        p.durDelay       = 0.5;
-        p.durRest        = [0.5 0.5];
+        cfgEvents.nBlock     = 1;
+        cfgEvents.nCatch     = 3;
+        cfgEvents.durInstruction = 1.0;
+        cfgEvents.durStim        = 0.2;
+        cfgEvents.durDelay       = 0.5;
+        cfgEvents.durRest        = [0.5 0.5];
     otherwise
         error('mode ?')
 end
@@ -60,31 +60,31 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Generate
 
-nStim = round(p.nCatch * 1/p.catchRatio);
-block_order = repmat(p.nBack, [1 p.nBlock]);
-p.nTrials = length(block_order) * nStim;
+nStim = round(cfgEvents.nCatch * 1/cfgEvents.catchRatio);
+block_order = repmat(cfgEvents.nBack, [1 cfgEvents.nBlock]);
+cfgEvents.nTrials = length(block_order) * nStim;
 
 blocks(length(block_order)) = struct;
 
 for iBlock = 1 : length(block_order)
-    
+
     % save difficulty info
     blocks(iBlock).nBack = block_order(iBlock);
-    
+
     % generate random pseudo-random stim
     starting_subgroup = round(rand)+1;
     ending_subgroup   = -starting_subgroup + 3; % [1 2] -> [2 1]
     blk = [];
     while length(blk) < nStim % generate as much as we need
-        blk = [blk Shuffle( p.availLetter{starting_subgroup} ) Shuffle( p.availLetter{ending_subgroup} )];
+        blk = [blk Shuffle( cfgEvents.availLetter{starting_subgroup} ) Shuffle( cfgEvents.availLetter{ending_subgroup} )];
     end
     blk = blk(1:nStim); % crop to the right number
-    
+
     % define position of catch trials
-    catch_position = linspace(1,nStim,p.nCatch+2); catch_position = catch_position(2:end-1); % evenly spread in the middle
-    displacement = round(3*(rand(1,p.nCatch)-0.5)); % add some radomness {-1 0 +1} in the position
+    catch_position = linspace(1,nStim,cfgEvents.nCatch+2); catch_position = catch_position(2:end-1); % evenly spread in the middle
+    displacement = round(3*(rand(1,cfgEvents.nCatch)-0.5)); % add some radomness {-1 0 +1} in the position
     catch_position = round(catch_position) + displacement;
-    
+
     if block_order(iBlock) == 0
         blk(catch_position) = {'X'}; % replace the catch trials
         blocks(iBlock).instruction = 'CLICK ON "X"';
@@ -94,23 +94,23 @@ for iBlock = 1 : length(block_order)
         end
         blocks(iBlock).instruction = sprintf('%d-BACK', block_order(iBlock));
     end
-    
+
     % save
     blocks(iBlock).Trials = blk;
     blocks(iBlock).CatchIdx = catch_position;
     vect = zeros(1,nStim);
     vect(catch_position) = 1;
     blocks(iBlock).CatchVect = vect;
-    
+
 end
 
 % save
-p.blocks = blocks;
+cfgEvents.blocks = blocks;
 
 
 %% Generate jitter
 
-all_jitters = linspace(p.durRest(1), p.durRest(2), length(block_order) + 1);
+all_jitters = linspace(cfgEvents.durRest(1), cfgEvents.durRest(2), length(block_order) + 1);
 all_jitters = Shuffle(all_jitters);
 
 
@@ -118,37 +118,37 @@ all_jitters = Shuffle(all_jitters);
 
 % Create and prepare
 header = {'event_name', 'onset(s)', 'duration(s)', '#trial',  '#block', '#stim', 'content', 'iscatch'};
-Planning = UTILS.RECORDER.Planning(header);
+planning = UTILS.RECORDER.Planning(header);
 
 % NextOnset = PreviousOnset + PreviousDuration
 NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
 
 % --- Start ---------------------------------------------------------------
 
-Planning.AddStartTime('StartTime',0);
+planning.AddStartTime('StartTime',0);
 
 % --- Stim ----------------------------------------------------------------
 
 count = 0;
 for iBlock = 1 : length(block_order)
-    
-    Planning.AddPlanning({     'Rest'        NextOnset(Planning) all_jitters(iBlock)   []    []     []    []                          []                               })
-    Planning.AddPlanning({     'Instruction' NextOnset(Planning) p.durInstruction      []    []     []    blocks(iBlock).instruction  []                               })
-    Planning.AddPlanning({     'Delay'       NextOnset(Planning) p.durDelay            []    []     []    []                          []                               })
+
+    planning.AddPlanning({     'Rest'        NextOnset(planning) all_jitters(iBlock)   []    []     []    []                          []                               })
+    planning.AddPlanning({     'Instruction' NextOnset(planning) cfgEvents.durInstruction      []    []     []    blocks(iBlock).instruction  []                               })
+    planning.AddPlanning({     'Delay'       NextOnset(planning) cfgEvents.durDelay            []    []     []    []                          []                               })
     for iStim = 1 : nStim
         count = count + 1;
-        Planning.AddPlanning({ 'Stim'        NextOnset(Planning) p.durStim             count iBlock iStim blocks(iBlock).Trials{iStim} blocks(iBlock).CatchVect(iStim) })
-        Planning.AddPlanning({ 'Delay'       NextOnset(Planning) p.durDelay            []    []     []    []                          []                               })
+        planning.AddPlanning({ 'Stim'        NextOnset(planning) cfgEvents.durStim             count iBlock iStim blocks(iBlock).Trials{iStim} blocks(iBlock).CatchVect(iStim) })
+        planning.AddPlanning({ 'Delay'       NextOnset(planning) cfgEvents.durDelay            []    []     []    []                          []                               })
     end
 end
-Planning.AddPlanning({         'Rest'        NextOnset(Planning) all_jitters(iBlock+1) []    []     []    []                          []                               })
+planning.AddPlanning({         'Rest'        NextOnset(planning) all_jitters(iBlock+1) []    []     []    []                          []                               })
 
 
 % --- Stop ----------------------------------------------------------------
 
-Planning.AddStopTime('StopTime',NextOnset(Planning));
+planning.AddStopTime('StopTime',NextOnset(planning));
 
-Planning.BuildGraph();
+planning.BuildGraph();
 
 
 %% Display
@@ -157,20 +157,14 @@ Planning.BuildGraph();
 % without output argument
 
 if nargin < 1
-    
+
     fprintf( '\n' )
-    fprintf(' \n Total stim duration : %g seconds \n' , NextOnset(Planning) )
+    fprintf(' \n Total stim duration : %g seconds \n' , NextOnset(planning) )
     fprintf( '\n' )
-    
-    Planning.Plot();
-    
+
+    planning.Plot();
+
 end
-
-
-%% Save
-
-
-Parameters = p;
 
 
 end % fcn
