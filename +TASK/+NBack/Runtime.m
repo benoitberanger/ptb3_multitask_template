@@ -24,7 +24,7 @@ cfg.Text.Center          = [0.5 0.5];         % Position_px = [ScreenX_px Screen
 S.Window = PTB_ENGINE.VIDEO.Window();
 
 % task specific paramters
-S.Window.bg_color = [0 0 0];
+S.Window.bg_color       = [0 0 0];
 S.Window.movie_filepath = [S.OutFilepath '.mov'];
 
 % set parameters from the GUI
@@ -35,12 +35,18 @@ S.Window.is_recored     = S.guiRecordMovie;
 
 S.Window.Open();
 
-S.Window
-
 
 %% prepare rendering object
 
-% FixationCross =
+FixationCross = PTB_OBJECT.VIDEO.FixationCross();
+FixationCross.window   = S.Window;
+FixationCross.dim      = cfg.FixationCross.Size;
+FixationCross.width    = cfg.FixationCross.Width;
+FixationCross.color    = cfg.FixationCross.Color;
+FixationCross.center_x = cfg.FixationCross.Position(1);
+FixationCross.center_y = cfg.FixationCross.Position(2);
+FixationCross.GenerateCoords();
+
 
 WaitSecs(1);
 sca

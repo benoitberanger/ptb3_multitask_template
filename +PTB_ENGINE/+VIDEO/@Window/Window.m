@@ -8,9 +8,9 @@ classdef Window < handle
         % here is a list of "default" parameters :
 
         % user-depend settings
-        bg_color          (1,3) double  = [128 128 128];    % [R G B]  , from 0 to 255
+        bg_color          (1,3) uint8   = [128 128 128];    % [R G B]  , from 0 to 255
         text_font         (1,:) char    = 'arial'
-        text_color        (1,4) double  = [200 200 200 255] % [R G B a], from 0 to 255
+        text_color        (1,4) uint8   = [200 200 200 255] % [R G B a], from 0 to 255
         text_size_ratio   (1,1) double  = 0.10              % text_size = text_size_ratio * window_size_y
         movie_filepath    (1,:) char    = ''
 
