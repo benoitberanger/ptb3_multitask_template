@@ -2,9 +2,7 @@ classdef Base < handle
     % BASE is a 'virtual' class : all subclasses contain this virtual class methods and attributes
 
     properties(GetAccess = public, SetAccess = public)
-
         window PTB_ENGINE.VIDEO.Window
-
     end % props
 
     methods(Access = public)

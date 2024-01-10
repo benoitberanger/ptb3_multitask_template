@@ -38,7 +38,7 @@ S.Window.Open();
 
 %% prepare rendering object
 
-FixationCross = PTB_OBJECT.VIDEO.FixationCross();
+FixationCross          = PTB_OBJECT.VIDEO.FixationCross();
 FixationCross.window   = S.Window;
 FixationCross.dim      = cfg.FixationCross.Size;
 FixationCross.width    = cfg.FixationCross.Width;
@@ -47,6 +47,13 @@ FixationCross.center_x = cfg.FixationCross.Position(1);
 FixationCross.center_y = cfg.FixationCross.Position(2);
 FixationCross.GenerateCoords();
 
+TextInstruction        = PTB_OBJECT.VIDEO.CenteredText();
+TextInstruction.window = S.Window;
+TextInstruction.color  = cfg.FixationCross.Color;
+TextInstruction.size   = 0.10;
+
+TextStim      = TextInstruction.CopyObject();
+TextStim.size = 0.20;
 
 WaitSecs(1);
 sca

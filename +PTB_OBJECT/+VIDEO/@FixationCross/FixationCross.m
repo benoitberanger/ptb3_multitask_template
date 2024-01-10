@@ -1,7 +1,8 @@
 classdef FixationCross < PTB_OBJECT.VIDEO.Base
-    %FIXATIONCROSS Class to prepare and draw a fixation cross in PTB
+    % FIXATIONCROSS Class to prepare and draw a fixation cross in PTB
 
     properties(GetAccess = public, SetAccess = public)
+        % User accessible paramters :
         dim      (1,1) double % ratio from window_size_y, from 0 to 1
         width    (1,1) double % ratio from self.dim, from 0 to 1
         color    (1,4) uint8  % [R G B a] from 0 to 255
@@ -10,6 +11,7 @@ classdef FixationCross < PTB_OBJECT.VIDEO.Base
     end % props
 
     properties(GetAccess = public, SetAccess = protected)
+        % Internal parameters :
         dim_px         (1,1) double
         width_px       (1,1) double
         center_x_px    (1,1) double
