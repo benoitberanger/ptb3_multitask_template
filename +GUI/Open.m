@@ -109,9 +109,9 @@ handles.edit_SubjectID = uicontrol(where, base_cfg_edit{:}, 'Position',[0.00 0.0
 %% Panel : Mode
 
 where = handles.uipanel_mode;
-handles.radiobutton_mode_acq       = uicontrol(where, base_cfg_radiobutton{:}, 'Position',[0.05 0.66 0.90 0.33], 'String','Acquistion', 'Tooltip','Save data, execute full script.');
-handles.radiobutton_mode_debug     = uicontrol(where, base_cfg_radiobutton{:}, 'Position',[0.05 0.33 0.90 0.33], 'String','Debug'     , 'Tooltip','Don''t save data, run the scripts ~normal speed.');
-handles.radiobutton_mode_fastdebug = uicontrol(where, base_cfg_radiobutton{:}, 'Position',[0.05 0.00 0.90 0.33], 'String','FastDebug' , 'Tooltip','Don''t save data, run the scripts very fast.');
+handles.radiobutton_mode_acq       = uicontrol(where, base_cfg_radiobutton{:}, 'Position',[0.05 0.66 0.90 0.33], 'String','Acquisition', 'Tooltip','Save data, execute full script.');
+handles.radiobutton_mode_debug     = uicontrol(where, base_cfg_radiobutton{:}, 'Position',[0.05 0.33 0.90 0.33], 'String','Debug'      , 'Tooltip','Don''t save data, run the scripts ~normal speed.');
+handles.radiobutton_mode_fastdebug = uicontrol(where, base_cfg_radiobutton{:}, 'Position',[0.05 0.00 0.90 0.33], 'String','FastDebug'  , 'Tooltip','Don''t save data, run the scripts very fast.');
 
 
 %% Panel : Save

@@ -53,10 +53,10 @@ S.guiTask        = GUI.GET.Task       ( hObject );
 
 %% Some warnings, and other stuff
 
-write_files = strcmp(S.guiACQmode, 'Acquistion') && S.guiSave;
+write_files = strcmp(S.guiACQmode, 'Acquisition') && S.guiSave;
 
 if write_files
-    logger.warn('In `Acquistion` mode, data should be saved.')
+    logger.warn('In `Acquisition` mode, data should be saved.')
 end
 
 

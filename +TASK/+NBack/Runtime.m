@@ -25,6 +25,7 @@ S.Window = PTB_ENGINE.VIDEO.Window();
 
 % task specific paramters
 S.Window.bg_color = [0 0 0];
+S.Window.movie_filepath = [S.OutFilepath '.mov'];
 
 % set parameters from the GUI
 S.Window.screen_id      = S.guiScreenID; % mandatory
@@ -35,6 +36,7 @@ S.Window.is_recored     = S.guiRecordMovie;
 S.Window.Open();
 
 S.Window
+
 
 %% prepare rendering object
 
