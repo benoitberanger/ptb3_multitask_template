@@ -113,7 +113,7 @@ end
 %% Task
 
 logger.log('Calling TASK.%s.Runtime()', S.guiTask)
-TASK.(S.guiTask).Runtime();
+TASK.(S.guiTask).Run();
 
 
 %% Save data 'raw' data immediatly
