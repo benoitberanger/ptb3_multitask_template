@@ -102,7 +102,7 @@ classdef Event < UTILS.RECORDER.Omni
             % Store
             self.BlockData = blockData;
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function BuildGraph( self , method )
@@ -210,7 +210,7 @@ classdef Event < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
     end % methods
 

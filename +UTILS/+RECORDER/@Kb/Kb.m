@@ -147,7 +147,7 @@ classdef Kb < UTILS.RECORDER.Omni
             % Store curves
             self.GraphData = self.KbEvents;
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function ComputeDurations( self )
@@ -205,7 +205,7 @@ classdef Kb < UTILS.RECORDER.Omni
 
             self.KbEvents = kbevents;
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function ComputePulseSpacing( self , graph )
@@ -259,7 +259,7 @@ classdef Kb < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function GenerateMRITrigger( self , tr, volumes, starttime )
@@ -316,7 +316,7 @@ classdef Kb < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function GetQueue( self )
@@ -337,7 +337,7 @@ classdef Kb < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function Start( self )
@@ -355,7 +355,7 @@ classdef Kb < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function Stop( self )
@@ -370,7 +370,7 @@ classdef Kb < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
     end % methods
 

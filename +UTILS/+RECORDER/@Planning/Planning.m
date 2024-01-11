@@ -60,7 +60,7 @@ classdef Planning < UTILS.RECORDER.Omni
                 error( 'Wrong number of arguments' )
             end
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function BuildGraph( self )
@@ -147,7 +147,7 @@ classdef Planning < UTILS.RECORDER.Omni
 
             end
 
-        end % function
+        end % fcn
 
 
     end % methods

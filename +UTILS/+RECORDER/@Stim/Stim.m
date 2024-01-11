@@ -1,255 +1,115 @@
-classdef Omni < UTILS.RECORDER.Base
-    % OMNI is a 'virtual' class : all subclasses contain this virtual class methods and attributes
-    % OmniRecorder can record everything.
-    % Data are stored in Cell.
-    % WARNING : if you need to store numeric data at high speed or for a lot of sample, use SampleRecorder.
+classdef (Abstract) Stim < UTILS.RECORDER.Cell
 
+    properties(GetAccess = public, SetAccess = public)
+        header_data (1,:) cell   = {''} % Description of each columns EXEPT `name` `onset` `duration`
+    end % properties
 
-    %% Properties
+    properties(GetAccess = public, SetAccess = public, Abstract)
+        display_symbol (1,1) char
+    end % properties
+    
+    properties(GetAccess = public, SetAccess = protected)
+        icol_name     (1,1) double = 1
+        icol_onset    (1,1) double = 2
+        icol_duration (1,1) double = 3
+        icol_data     (1,1) double = 4
+        graph_data    (1,:) struct
+    end % props
 
-    properties
-        Data           (:,:) cell                                          % cell( NumberOfEvents , Columns )
-        Columns        (1,1) double {mustBeInteger,mustBeInteger}
-        NumberOfEvents (1,1) double {mustBeInteger,mustBeInteger}
-        EventCount     (1,1) double {mustBeInteger,mustBeInteger}
-        GraphData      (:,:) cell                                          % cell( 'ev1' curve1 ; 'ev2' curve2 ; ... )
-    end
-
-
-    %% Methods
-
-    methods
+    methods(Access = public)
 
         %---- Constructor -------------------------------------------------
-        function self = Omni()
-            % pass
+        function self = Stim(header_data, nline)
+            if nargin < 2
+                header_data = {};
+            end
+            self = self@UTILS.RECORDER.Cell([{'name', 'onset', 'duration'} header_data], nline)
+            self.header_data = header_data;
+            self.description = class(self);
+        end
+
+        %------------------------------------------------------------------
+        function AddStim(self, name, onset, duration, data)
+            if nargin < 5
+                data = {};
+            end
+            self.IncreaseCount();
+            self.AddLine([{name, onset, duration} data])
         end % fcn
 
         %------------------------------------------------------------------
-        function AddEvent( self , event )
-            % self.AddEvent( cell(1,n) = { 'eventName' data1 date2 ... } )
-            %
-            % Add event, according to the dimensions given by the Header
-
-            if length( event ) == self.Columns % Check input arguments
-                if size( event , 1 ) > 0 && size( event , 2 ) == 1 % if iscolumn( event )
-                    event = event';
-                end
-                self.IncreaseEventCount;
-                self.Data( self.EventCount , : ) = event;
-            else
-                error( 'Wrong number of arguments' )
+        function AddStart( self, starttime )
+            if nargin < 2
+                starttime = 0;
             end
-        end % function
+            self.AddStim(self.label_start, starttime, 0);
+        end % fcn
 
         %------------------------------------------------------------------
-        function AddStartTime( self, starttime_name , starttime )
-            % self.AddStartTime( StartTime_name = str , StartTime = double )
-            %
-            % Add special event { StartTime_name starttime }
-
-            if ~ischar( starttime_name )
-                error( 'StartTime_name must be string' )
+        function AddEnd( self, endtime )
+            if nargin < 2
+                endtime = 0;
             end
-
-            if ~isnumeric( starttime )
-                error( 'StartTime must be numeric' )
-            end
-
-            self.IncreaseEventCount;
-            self.Data( self.EventCount , 1:3 ) = { starttime_name starttime 0 };
-            % ex : Add T_start = 0 on the next line (usually first line)
-
-        end % function
-
-        %------------------------------------------------------------------
-        function AddStopTime( self, stoptime_name , starttime )
-            % self.AddStartTime( StopTime_name = str , StartTime = double )
-            %
-            % Add special event { StopTime_name starttime }
-
-            if ~ischar( stoptime_name )
-                error( 'StopTime_name must be string' )
-            end
-
-            if ~isnumeric( starttime )
-                error( 'StopTime must be numeric' )
-            end
-
-            self.IncreaseEventCount;
-            self.Data( self.EventCount , 1:3 ) = { stoptime_name starttime 0 };
-            % ex : Add T_stop = 0 on the next line (usually last line)
-
-        end % function
-
-        %------------------------------------------------------------------
-        function ClearEmptyEvents( self )
-            % self.ClearEmptyEvents()
-            %
-            % Delete empty rows. Useful when NumberOfEvents is not known
-            % precisey but set to a great value (better for prealocating
-            % memory).
-
-            empty_idx = cellfun( @isempty , self.Data(:,1) );
-            self.Data( empty_idx , : ) = [];
-
-        end % function
+            self.AddStim(self.label_end, endtime, 0);
+        end % fcn
 
         %------------------------------------------------------------------
         function ComputeDurations( self )
-            % self.ComputeDurations()
-            %
+
             % Compute durations for each onsets
+            onsets               = cell2mat( self.data(:,self.icol_onset) ); % Get the times
+            durations            = diff(onsets);                             % Compute the differences
+            self.data(1:end-1,self.icol_duration) = num2cell( durations );   % Save durations
 
-            onsets               = cell2mat( self.Data (:,2) ); % Get the times
-            duration             = diff(onsets);               % Compute the differences
-            self.Data(1:end-1,3) = num2cell( duration );       % Save durations
-
-            % For the last event, usually StopTime, we need an exception.
-            if strcmp( self.Data{end,1} , 'StopTime' )
-                self.Data{end,3} = 0;
+            % For the last event, usually `label_stop`, we need an exception.
+            if strcmp( self.data{end,self.icol_name} , self.label_stop )
+                self.data{end,self.icol_duration} = 0;
             end
 
-
-        end % function
-
-        %------------------------------------------------------------------
-        function [ output ] = Fetch( self, str, column )
-            %FETCH will fetch the lines containing 'str' in the column 'column'
-            %
-            % Exemple : self.Fetch( '+', self.Get('reward') )
-            %
-            % If 'column' is not defined, it will fetch in the culumn=1;
-            % To easily get a column index, use self.Get('columnRegex') method
-
-            if nargin < 3
-                column = 1;
-            end
-
-            assert( nargin>=2 , 'str must be defined')
-            assert( ischar(str) && isvector(str), 'str must be char' )
-
-            try
-                lines = ~cellfun(@isempty,regexp(self.Data(:,column),str,'once'));
-            catch err
-                error('self.Data(:,column) must be char')
-            end
-
-            output = self.Data(lines,:);
-
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
-        function IncreaseEventCount( self )
-            % self.IncreaseEventCount()
-            %
-            % Method used by other methods of the class. Usually, it's not
-            % used from outside of the class.
-
-            self.EventCount = self.EventCount + 1;
-
-        end % function
-
-        %------------------------------------------------------------------
-        function Plot( self , method )
-            % self.Plot( [method] )
-            %
-            % Plot events over the time.
-            % method = 'normal' , 'block'
-
-            % Arguments ?
+        function ScaleTime( self, t0 )
+            % Scale the time origin to the first entry in self.data
             if nargin < 2
-                method = 'normal';
-            else
-                if ~ischar(method)
-                    error('method must be a char')
-                end
+                t0 = self.data( 1 , self.icol_onset );
             end
+            time = cell2mat( self.data( : , self.icol_onset ) ); % Onsets of events
+            self.data( : , self.icol_onset ) = num2cell( time - t0 );
+        end % fcn
 
-            switch lower(method)
-                case 'normal'
-                    input  = 'GraphData';
-                case 'block'
-                    input  = 'BlockGraphData';
-                otherwise
-                    error( 'unknown method : %s' , method )
-            end
-
+        %------------------------------------------------------------------
+        function Plot( self )
             % =============== BuildGraph if necessary =====================
 
-            % Each subclass has its own BuildGraph method because Data
+            % Each subclass has its own BuildGraph() method because Data
             % properties are different. But each BuildGraph subclass method
-            % converge to a uniform GraphData.
+            % converge to a uniform graph_data.
 
-            if nargin < 2 % no input argument
-
-                if isprop(self,'BlockData') && ~isempty(self.BlockData) && isempty(self.BlockGraphData) % BlockData exists ?
-                    self.BuildGraph('block')
-                    input  = 'BlockGraphData';
-
-                elseif isprop(self,'BlockData') && ~isempty(self.BlockData)
-                    input  = 'BlockGraphData';
-
-                elseif  isempty(self.GraphData)
-                    self.BuildGraph;
-
-                end
-
-            end
-
-            % ======================== Plot ===============================
-
-
-            className = class(self);
-
-            % Depending on the object calling the method, the display changes.
-            switch className
-                case 'UTILS.RECORDER.Event'
-                    display_method = '+';
-                case 'UTILS.RECORDER.Kb'
-                    display_method = '*';
-                case 'UTILS.RECORDER.Planning'
-                    display_method = '+';
-                otherwise
-                    error('Unknown object caller. Check self.Description')
+            if isempty(self.graph_data)
+                self.BuildGraph();
             end
 
             % Figure
-            figure( ...
-                'Name'        , [ inputname(1) ' : ' className ] , ...
-                'NumberTitle' , 'off'                         ...
-                )
+            figure('Name', [ inputname(1) ' : ' class(self) ], 'NumberTitle' ,'off')
             hold all
 
             % For each Event, plot the curve
-            for e = 1 : size( self.(input) , 1 )
+            for e = 1 : length(self.graph_data)
 
-                if ~isempty(self.(input){e,2})
-
-                    switch display_method
-
-                        case '+'
-                            plot( self.(input){e,3}(:,1) , self.(input){e,3}(:,2) + e )
-
-                        case '*'
-                            plot( self.(input){e,3}(:,1) , self.(input){e,3}(:,2) * e )
-
-                        otherwise
-                            error('Unknown display_method')
-                    end
-
-                else
-
-                    plot(0,NaN)
-
+                switch self.display_symbol
+                    case '+'
+                        plot( self.graph_data(e).x, self.graph_data(e).y + e )
+                    case '*'
+                        plot( self.graph_data(e).x , self.graph_data(e).y * e )
+                    otherwise
+                        error('Unknown display_method')
                 end
-
             end
 
             % Legend
-            lgd = legend( self.(input)(:,1) );
+            lgd = legend( {self.graph_data.name} );
             set(lgd,'Interpreter','none','Location','Best')
-
 
             % ================ Adapt the graph axes limits ================
 
@@ -261,23 +121,20 @@ classdef Omni < UTILS.RECORDER.Base
             % ================ Change YTick and YTickLabel ================
 
             % Put 1 tick in the middle of each event
-            switch display_method
+            switch self.display_symbol
                 case '+'
-                    set( gca , 'YTick' , (1:size( self.(input) , 1 ))+0.5 )
+                    set( gca , 'YTick' , (1:length(self.graph_data))+0.5 )
                 case '*'
-                    set( gca , 'YTick' , (1:size( self.(input) , 1 )) )
+                    set( gca , 'YTick' , (1:length(self.graph_data))     )
             end
 
             % Set the tick label to the event name
-            set( gca , 'YTickLabel' , self.(input)(:,1) )
+            set( gca , 'YTickLabel' , {self.graph_data.name} )
 
             % Not all versions of MATLAB have this option
-            try
-                set(gca, 'TickLabelInterpreter', 'none')
-            catch %#ok<CTCH>
-            end
+            set(gca, 'TickLabelInterpreter', 'none')
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function PlotHRF( self, TR, nrVolumes )
@@ -291,7 +148,7 @@ classdef Omni < UTILS.RECORDER.Base
             assert( ~isempty( which('spm_hrf') ) , 'SPM toolbox is required' )
 
             % Data
-            assert( size(self.Data,1)>1, 'Empty data' )
+            assert( size(self.data,1)>1, 'Empty data' )
 
             % TR
             assert( nargin>=1, 'TR is required to estimate the stimulus response function' )
@@ -299,21 +156,21 @@ classdef Omni < UTILS.RECORDER.Base
 
             % nrVolumes
             if nargin < 3
-                nrVolumes = ceil( self.Data{end,2}/TR ) + 1;
+                nrVolumes = ceil( self.data{end,2}/TR ) + 1;
             end
             assert( isnumeric(nrVolumes) && isscalar(nrVolumes) && nrVolumes>0 && nrVolumes==round(nrVolumes) , 'nrVolumes must be positive integer' )
 
 
-            %=== Format self.Data into names onsets durations
+            %=== Format self.data into names onsets durations
 
-            [names,~,indC] = unique( self.Data(:,1) , 'stable' );
+            [names,~,indC] = unique( self.data(:,1) , 'stable' );
 
             onsets    = cell(size(names));
             durations = cell(size(names));
 
             for n = 1 : length(names)
-                onsets{n}    = cell2mat( self.Data(indC==n,2) );
-                durations{n} = cell2mat( self.Data(indC==n,3) );
+                onsets{n}    = cell2mat( self.data(indC==n,2) );
+                durations{n} = cell2mat( self.data(indC==n,3) );
             end % names
 
 
@@ -549,53 +406,8 @@ classdef Omni < UTILS.RECORDER.Base
 
             legend('show')
 
-
-        end % function
-
-        %------------------------------------------------------------------
-        function ScaleTime( self, t0 )
-            % self.ScaleTime()
-            %
-            % Scale the time origin to the first entry in self.Data
-
-            if nargin < 2
-                t0 = [];
-            end
-
-            % Onsets of events
-            time = cell2mat( self.Data( : , 2 ) );
-
-            className = class(self);
-
-            % Depending on the object calling the method, the display changes.
-            switch className
-                case 'EventRecorder'
-                    column_to_write_scaled_onsets = 2;
-                    value = time(1);
-                case 'KbLogger'
-                    column_to_write_scaled_onsets = 4;
-                    if ~isempty(t0)
-                        value = t0;
-                    else
-                        value = time(1);
-                    end
-                case 'EventPlanning'
-                    column_to_write_scaled_onsets = 2;
-                    value = time(1);
-                otherwise
-                    error('Unknown object caller. Check self.Description')
-            end
-
-            % Write scaled time
-            if ~isempty( time )
-                self.Data( : , column_to_write_scaled_onsets ) = num2cell( time - value );
-            else
-                warning( 'Recorder:ScaleTime' , 'No data in %s.Data (%s)' , inputname(1) , className )
-            end
-
-        end % function
-
+        end % fcn
+        
     end % meths
 
-
-end % classdef
+end % class

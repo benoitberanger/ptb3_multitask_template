@@ -24,7 +24,7 @@ classdef CenteredText < PTB_OBJECT.VIDEO.Base
             self.content = content;
             Screen('TextSize' , self.window.ptr, self.size*self.window.size_y );
             DrawFormattedText(self.window.ptr, self.content, 'center', 'center', self.color);
-        end % function
+        end % fcn
 
     end % meths
 

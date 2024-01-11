@@ -1,74 +1,82 @@
-classdef Base < handle
-    % BASE is a 'virtual' class : all subclasses contain this virtual class methods and attributes
+classdef (Abstract) Base < handle
     % This is a very basic object, just a container of simple methods
 
-
-    %% Properties
-
-    properties
-        TimeStamp   (1,:) char  = datestr( now )          % Time stamp for the creation of object
-        Description (1,:) char  = mfilename( 'fullpath' ) % Fullpath of the file
-        Header      (1,:) cell  = {''}                    % Description of each columns
+    properties(GetAccess = public, SetAccess = public)
+        header      (1,:) cell   = {''}                    % Description of each columns
+        n_col       (1,1) double = 0
+        n_lin       (1,1) double = 0
+        count       (1,1) double = 0
+        data        (:,:)
     end % props
 
-
-    %% Methods
-
-    methods
-
+    properties(GetAccess = public, SetAccess = protected)
+        timestamp   (1,:) char   = datestr( now ) % creation of object
+        description (1,:) char   = ''
+        label_start (1,:) char   = 'START'
+        label_enb   (1,:) char   = 'END'
+    end % props
+    
+    methods(Access = public)
+        
         %---- Constructor -------------------------------------------------
         function self = Base()
-            % pass
+            self.description = class(self);
         end
 
         %------------------------------------------------------------------
+        function IncreaseCount(self, n)
+            if nargin < 2
+                n = +1;
+            end
+            self.count = self.count + n;
+        end
+
+        %------------------------------------------------------------------
+        function AddLine(self, content)
+            assert(isvector(content) && length(content)==self.n_col, 'wrong content')
+            self.IncreaseCount();
+            self.data(self.count, :) = content;
+        end % fcn
+
+        %------------------------------------------------------------------
+        function ClearEmptyLines( self )
+            self.data = self.data(self.count+1:end,:);
+        end % fcn
+
+        %------------------------------------------------------------------
         function newObject = CopyObject( self )
-            % newObject = self.CopyObject()
-            %
             % Deep copy of the object
-
-            % Class name ?
             className = class( self );
-
-            % Properties of this class ?
             propOfClass = properties( self );
-
-            % New instance of this class
             newObject = eval(className);
-
-            % Copy each properties
             for p = 1 : length(propOfClass)
                 newObject.(propOfClass{p}) = self.(propOfClass{p});
             end
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function t = data2table( self )
-            data = self.Data; % make a copy so it can be modified if necessary
+            DATA = self.data; % make a copy so it can be modified if necessary
 
-            if iscell(data)
-
+            if iscell(DATA)
                 % remove StartTime & StopTime
-                startstop = strcmp( data(:,1), 'StartTime' ) | strcmp( data(:,1), 'StopTime' );
-                data( startstop , : ) = [];
+                startstop = strcmp( DATA(:,1), 'StartTime' ) | strcmp( DATA(:,1), 'StopTime' );
+                DATA( startstop , : ) = [];
+                t = cell2table(DATA,'VariableName',matlab.lang.makeValidName(self.header));
 
-                t = cell2table(data,'VariableName',matlab.lang.makeValidName(self.Header));
-
-            elseif isnumeric(data)
-
-                t = array2table(data,'VariableName',matlab.lang.makeValidName(self.Header));
+            elseif isnumeric(DATA)
+                t = array2table(DATA,'VariableName',matlab.lang.makeValidName(self.header));
 
             end
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function ExportToCSV( self, filename, withHeader )
             if nargin < 3
                 withHeader = 1;
             end
-
             self.ExportToTxt(filename,'csv',withHeader)
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function savestruct = ExportToStructure( self )
@@ -81,10 +89,11 @@ classdef Base < handle
 
             ListProperties = properties(self);
 
+            savestruct = struct;
             for prop_number = 1:length(ListProperties)
                 savestruct.(ListProperties{prop_number}) = self.(ListProperties{prop_number});
             end
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function ExportToTSV( self, filename, withHeader )
@@ -93,7 +102,7 @@ classdef Base < handle
             end
 
             self.ExportToTxt(filename,'tsv',withHeader)
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function ExportToTxt( self, filename, filetype, withHeader )
@@ -120,8 +129,8 @@ classdef Base < handle
             % Fill the file
             % Print header
             if withHeader
-                for h = 1 : length(self.Header)
-                    fprintf(fileID, '%s%s', self.Header{h},sep);
+                for h = 1 : length(self.header)
+                    fprintf(fileID, '%s%s', self.header{h},sep);
                 end
                 fprintf(fileID, '\n'); % end of line
             end
@@ -184,7 +193,7 @@ classdef Base < handle
             % Close the file
             fclose( fileID );
 
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
         function [ output ] = Get( self, str, evt )
@@ -198,7 +207,7 @@ classdef Base < handle
             % The 'regex' is a regular expression that will be found in obj.Header
             %
 
-            column = ~cellfun(@isempty,regexp(self.Header,str,'once'));
+            column = ~cellfun(@isempty,regexp(self.header,str,'once'));
             assert(any(column), 'Get method did not find ''%s'' in the Header', str)
 
             column = find(column);
@@ -233,23 +242,22 @@ classdef Base < handle
             end
 
             error('evt ?')
-        end % function
+        end % fcn
 
         %------------------------------------------------------------------
-        function IsEmptyProperty( self , propertyname )
+        function IsEmptyProp( self , propertyname )
             % self.IsEmptyProperty( PropertyName )
             %
             % Raise an error if self.'PropertyName' is empty
 
             % Fetch caller object
-            [~, objName, ~] = fileparts(self.Description);
+            [~, objName, ~] = fileparts(self.description);
 
             if isempty(self.(propertyname))
                 error('No data in %s.%s' , objName , propertyname )
             end
-        end % function
+        end % fcn
 
     end % meths
-
 
 end % classdef
