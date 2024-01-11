@@ -112,7 +112,12 @@ end
 
 %% Task
 
-logger.log('Calling TASK.%s.Runtime()', S.guiTask)
+result = which(sprintf('TASK.%s.Run', S.guiTask));
+if isempty(result)
+    logger.err('No `Run.m` file found to start the task `%s`. Expected path = %s', S.guiTask, fullfile(S.ProjectRootDir,'+TASK',sprintf('+%s',S.guiTask),'Run.m'))
+    return
+end
+logger.log('Calling TASK.%s.Run()', S.guiTask)
 TASK.(S.guiTask).Run();
 
 
