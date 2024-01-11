@@ -1,6 +1,10 @@
 classdef Event < UTILS.RECORDER.Stim
     % real stim, onset and duration will be compared to the ones registerd in @UTILS.RECORDER.Planning
 
+    properties(GetAccess = public, SetAccess = public)
+        display_symbol = '+'
+    end % properties
+    
     methods(Access = public)
 
         %------------------------------------------------------------------

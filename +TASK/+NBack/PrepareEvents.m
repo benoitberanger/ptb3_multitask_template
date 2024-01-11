@@ -117,38 +117,33 @@ all_jitters = Shuffle(all_jitters);
 %% Build planning
 
 % Create and prepare
-header = {'event_name', 'onset(s)', 'duration(s)', '#trial',  '#block', '#stim', 'content', 'iscatch'};
-planning = UTILS.RECORDER.Planning(header);
-
-% NextOnset = PreviousOnset + PreviousDuration
-NextOnset = @(EP) EP.Data{end,2} + EP.Data{end,3};
+header = {'#trial',  '#block', '#stim', 'content', 'iscatch'};
+planning = UTILS.RECORDER.Planning(0,header);
 
 % --- Start ---------------------------------------------------------------
 
-planning.AddStartTime('StartTime',0);
+planning.AddStart();
 
 % --- Stim ----------------------------------------------------------------
 
-count = 0;
+iTrial = 0;
 for iBlock = 1 : length(block_order)
 
-    planning.AddPlanning({     'Rest'        NextOnset(planning) all_jitters(iBlock)   []    []     []    []                          []                               })
-    planning.AddPlanning({     'Instruction' NextOnset(planning) cfgEvents.durInstruction      []    []     []    blocks(iBlock).instruction  []                               })
-    planning.AddPlanning({     'Delay'       NextOnset(planning) cfgEvents.durDelay            []    []     []    []                          []                               })
+    planning.AddStim(      'Rest',        planning.GetNextOnset(), all_jitters(iBlock)       )
+    planning.AddStim(      'Instruction', planning.GetNextOnset(), cfgEvents.durInstruction, {[]     []     []    blocks(iBlock).instruction  []                               })
+    planning.AddStim(      'Delay',       planning.GetNextOnset(), cfgEvents.durDelay        )
     for iStim = 1 : nStim
-        count = count + 1;
-        planning.AddPlanning({ 'Stim'        NextOnset(planning) cfgEvents.durStim             count iBlock iStim blocks(iBlock).Trials{iStim} blocks(iBlock).CatchVect(iStim) })
-        planning.AddPlanning({ 'Delay'       NextOnset(planning) cfgEvents.durDelay            []    []     []    []                          []                               })
+        iTrial = iTrial + 1;
+        planning.AddStim(  'Stim',        planning.GetNextOnset(), cfgEvents.durStim,        {iTrial iBlock iStim blocks(iBlock).Trials{iStim} blocks(iBlock).CatchVect(iStim) })
+        planning.AddStim(  'Delay',       planning.GetNextOnset(), cfgEvents.durDelay        )
     end
 end
-planning.AddPlanning({         'Rest'        NextOnset(planning) all_jitters(iBlock+1) []    []     []    []                          []                               })
+planning.AddStim(          'Rest',        planning.GetNextOnset(), all_jitters(iBlock+1)     )
 
 
 % --- Stop ----------------------------------------------------------------
 
-planning.AddStopTime('StopTime',NextOnset(planning));
-
-planning.BuildGraph();
+planning.AddEnd(planning.GetNextOnset());
 
 
 %% Display
@@ -159,7 +154,7 @@ planning.BuildGraph();
 if nargin < 1
 
     fprintf( '\n' )
-    fprintf(' \n Total stim duration : %g seconds \n' , NextOnset(planning) )
+    fprintf(' \n Total stim duration : %g seconds \n' , planning.GetNextOnset() )
     fprintf( '\n' )
 
     planning.Plot();

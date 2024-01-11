@@ -28,7 +28,7 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
         %------------------------------------------------------------------
         function AddStim(self, name, onset, duration, data)
             if nargin < 5
-                data = {};
+                data = cell(size(self.header_data));
             end
             self.AddLine([{name, onset, duration} data])
         end % fcn

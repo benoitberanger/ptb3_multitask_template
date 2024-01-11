@@ -18,6 +18,11 @@ classdef Planning < UTILS.RECORDER.Stim
             self.description = class(self);
         end
 
+        %------------------------------------------------------------------
+        function value = GetNextOnset(self)
+            value = self.data{self.count, self.icol_onset} + self.data{self.count, self.icol_duration};
+        end
+
     end % methods
 
 end % class
