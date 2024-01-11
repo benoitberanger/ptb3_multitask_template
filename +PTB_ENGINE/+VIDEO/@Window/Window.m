@@ -72,7 +72,7 @@ classdef Window < handle
             try
                 [self.ptr,self.rect] = Screen('OpenWindow',self.screen_id,self.bg_color,WindowRect,[],[],[],self.anti_aliazing);
             catch err
-                logger.err(err.msg)
+                logger.err(err.message)
                 Screen('Preference', 'SkipSyncTests', 1);
                 [self.ptr,self.rect] = Screen('OpenWindow',self.screen_id,self.bg_color,WindowRect,[],[],[],self.anti_aliazing);
             end
