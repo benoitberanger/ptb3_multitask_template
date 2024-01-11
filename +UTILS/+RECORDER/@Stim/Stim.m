@@ -7,7 +7,7 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
     properties(GetAccess = public, SetAccess = public, Abstract)
         display_symbol (1,1) char
     end % properties
-    
+
     properties(GetAccess = public, SetAccess = protected)
         icol_name     (1,1) double = 1
         icol_onset    (1,1) double = 2
@@ -19,11 +19,8 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
     methods(Access = public)
 
         %---- Constructor -------------------------------------------------
-        function self = Stim(header_data, nline)
-            if nargin < 2
-                header_data = {};
-            end
-            self = self@UTILS.RECORDER.Cell([{'name', 'onset', 'duration'} header_data], nline)
+        function self = Stim(nline,header_data)
+            self = self@UTILS.RECORDER.Cell([{'name', 'onset', 'duration'} header_data], nline+2) % +2 : AddStart + AddEnd
             self.header_data = header_data;
             self.description = class(self);
         end
@@ -33,7 +30,6 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
             if nargin < 5
                 data = {};
             end
-            self.IncreaseCount();
             self.AddLine([{name, onset, duration} data])
         end % fcn
 
@@ -79,6 +75,63 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
         end % fcn
 
         %------------------------------------------------------------------
+        function BuildGraph( self )
+            % Build curves for each events, ready to be plotted.
+
+            % ===================== Regroup each event ====================
+
+            % Check if not empty
+            self.IsEmptyProp('data');
+
+            [ event_name , ~ , idx_event2data ] = unique(self.data(:,self.icol_name), 'stable');
+
+            self.graph_data = struct;
+
+            for e = 1:length(event_name)
+                self.graph_data(e).name     = event_name{e};
+                self.graph_data(e).onset    = cell2mat ( self.data( idx_event2data == e , self.icol_onset    ) );
+                self.graph_data(e).duration = cell2mat ( self.data( idx_event2data == e , self.icol_duration ) );
+            end
+
+            % ================= Build curves for each Event ===============
+
+            for e = 1 : length(self.graph_data) % For each Event
+
+                N   = length(self.graph_data(e).onset);
+                pts = 5; % build : rectangle -> 4 corners + 1 invisible point between event
+                data = nan(N*pts,2);
+
+                for n = 1 : N
+
+                    % 4 corner X
+                    data(pts*n+0,1) = self.graph_data(e).onset(n);
+                    data(pts*n+1,1) = self.graph_data(e).onset(n);
+                    data(pts*n+2,1) = self.graph_data(e).onset(n) + self.graph_data(e).duration(n);
+                    data(pts*n+3,1) = self.graph_data(e).onset(n) + self.graph_data(e).duration(n);
+
+                    % 4 corners Y
+                    data(pts*n+0,2) = 0;
+                    data(pts*n+1,2) = 1;
+                    data(pts*n+2,2) = 1;
+                    data(pts*n+3,2) = 0;
+
+                    % +1 invisible point between events
+                    if n < N
+                        data(pts*n+4,1) = self.graph_data(e).onset(n+1);
+                        data(pts*n+4,1) = NaN;
+                    end
+
+                end
+
+                % Store curves
+                self.graph_data(e).x = data(:,1);
+                self.graph_data(e).y = data(:,2);
+
+            end % e
+
+        end % fcn
+
+        %------------------------------------------------------------------
         function Plot( self )
             % =============== BuildGraph if necessary =====================
 
@@ -103,7 +156,7 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
                     case '*'
                         plot( self.graph_data(e).x , self.graph_data(e).y * e )
                     otherwise
-                        error('Unknown display_method')
+                        error('Unknown display_symbol')
                 end
             end
 
@@ -407,7 +460,7 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
             legend('show')
 
         end % fcn
-        
+
     end % meths
 
 end % class

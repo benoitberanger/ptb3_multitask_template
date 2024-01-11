@@ -13,7 +13,7 @@ classdef (Abstract) Base < handle
         timestamp   (1,:) char   = datestr( now ) % creation of object
         description (1,:) char   = ''
         label_start (1,:) char   = 'START'
-        label_enb   (1,:) char   = 'END'
+        label_end   (1,:) char   = 'END'
     end % props
     
     methods(Access = public)
