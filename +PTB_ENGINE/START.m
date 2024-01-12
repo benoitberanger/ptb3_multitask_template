@@ -1,4 +1,4 @@
-function t0 = START(keyStart,keyAbort)
+function STARTtime = START(keyStart,keyAbort)
 global S
 
 switch S.guiACQmode
@@ -24,7 +24,7 @@ switch S.guiACQmode
 
         while 1
 
-            [keyIsDown, t0, keyCode] = KbCheck();
+            [keyIsDown, STARTtime, keyCode] = KbCheck();
 
             if ~keyIsDown
                 continue
@@ -36,11 +36,17 @@ switch S.guiACQmode
             end
 
             if any(keyCode(keyAbort))
+
+                % sca -- Execute Screen('CloseAll'); WRAPPER
                 sca
+
+                % Close all pahandle if audio is active
                 [~,M,~] = inmem;
                 if strcmp(M,'PsychPortAudio')
                     PsychPortAudio('Close');
                 end
+
+                % dump global S in a .mat file, for diagnostic
                 if S.WriteFiles
                     save([S.OutFilepath '_ABORT.mat'], 'S')
                 end
@@ -51,10 +57,8 @@ switch S.guiACQmode
 
     otherwise
         fprintf('START event in debug mod \n')
-        t0 = GetSecs();
+        STARTtime = GetSecs();
 
-end
-
-
+end % switch
 
 end % fcn

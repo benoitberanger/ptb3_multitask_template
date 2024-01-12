@@ -9,25 +9,25 @@ global S
 
 %% set keybinds
 
-cfg.Keybinds = TASK.cfgKeyboard(); % cross task keybinds
+S.cfgKeybinds = TASK.cfgKeyboard(); % cross task keybinds
 
 switch S.guiKeybind
     case 'fORP (MRI)'
-        cfg.Keybinds.Catch = KbName('b');
+        S.cfgKeybinds.Catch = KbName('b');
     case 'Keyboard'
-        cfg.Keybinds.Catch = KbName('DownArrow');
+        S.cfgKeybinds.Catch = KbName('DownArrow');
     otherwise
 end
 
 
 %% set parameters for rendering objects
 
-cfg.FixationCross = TASK.cfgFixationCross();
+S.cfgFixationCross = TASK.cfgFixationCross();
 
-cfg.Text.SizeInstruction = 0.10;              % TextSize = round(ScreenY_px * Size)
-cfg.Text.SizeStim        = 0.20;              % TextSize = round(ScreenY_px * Size)
-cfg.Text.Color           = [127 127 127 255]; % [R G B a], from 0 to 255
-cfg.Text.Center          = [0.5 0.5];         % Position_px = [ScreenX_px ScreenY_px] .* Position
+S.cfgText.SizeInstruction = 0.10;              % TextSize = round(ScreenY_px * Size)
+S.cfgText.SizeStim        = 0.20;              % TextSize = round(ScreenY_px * Size)
+S.cfgText.Color           = [127 127 127 255]; % [R G B a], from 0 to 255
+S.cfgText.Center          = [0.5 0.5];         % Position_px = [ScreenX_px ScreenY_px] .* Position
 
 
 %% start PTB engine
@@ -53,16 +53,16 @@ S.Window.Open();
 
 FixationCross          = PTB_OBJECT.VIDEO.FixationCross();
 FixationCross.window   = Window;
-FixationCross.dim      = cfg.FixationCross.Size;
-FixationCross.width    = cfg.FixationCross.Width;
-FixationCross.color    = cfg.FixationCross.Color;
-FixationCross.center_x = cfg.FixationCross.Position(1);
-FixationCross.center_y = cfg.FixationCross.Position(2);
+FixationCross.dim      = S.cfgFixationCross.Size;
+FixationCross.width    = S.cfgFixationCross.Width;
+FixationCross.color    = S.cfgFixationCross.Color;
+FixationCross.center_x = S.cfgFixationCross.Position(1);
+FixationCross.center_y = S.cfgFixationCross.Position(2);
 FixationCross.GenerateCoords();
 
 TextInstruction        = PTB_OBJECT.VIDEO.CenteredText();
 TextInstruction.window = Window;
-TextInstruction.color  = cfg.FixationCross.Color;
+TextInstruction.color  = S.cfgFixationCross.Color;
 TextInstruction.size   = 0.10;
 
 TextStim      = TextInstruction.CopyObject();
@@ -72,21 +72,21 @@ TextStim.size = 0.20;
 %% run the events
 
 for evt = 1 : S.Planning.count
-    
+
     evt_name     = S.Planning.data{evt,S.Planning.icol_name    };
     evt_onset    = S.Planning.data{evt,S.Planning.icol_onset   };
     evt_duration = S.Planning.data{evt,S.Planning.icol_duration};
-    
+
     switch evt_name
         case 'START'
             FixationCross.Draw();
             Window.Flip();
-            t0 = PTB_ENGINE.START(cfg.Keybinds.Start, cfg.Keybinds.Abort);
+            S.STARTtime = PTB_ENGINE.START(S.cfgKeybinds.Start, S.cfgKeybinds.Abort);
         case 'END'
         otherwise
             error('unknown event : %s', evt_name)
     end % switch
-    
+
 end % evt
 
 WaitSecs(1);
