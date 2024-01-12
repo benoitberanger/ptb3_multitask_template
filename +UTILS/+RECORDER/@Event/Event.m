@@ -10,11 +10,9 @@ classdef Event < UTILS.RECORDER.Stim
         %------------------------------------------------------------------
         %                           Constructor
         %------------------------------------------------------------------
-        function self = Event(nline,header_data)
-            if nargin < 2
-                header_data = {};
-            end
-            self = self@UTILS.RECORDER.Stim(nline,header_data)
+        function self = Event(planning)
+            assert(isa(planning, 'UTILS.RECORDER.Planning'))
+            self = self@UTILS.RECORDER.Stim(planning.count,planning.header_data)
             self.description = class(self);
         end
 

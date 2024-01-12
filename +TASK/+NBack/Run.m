@@ -1,10 +1,14 @@
-function Runtime()
+function Run()
 global S
 
 
 %% prepare events, timings, randomization
 
 [S.Planning, S.cfgEvents] = TASK.(S.guiTask).PrepareEvents(S.guiACQmode);
+
+%% create other recorders
+
+S.Event = UTILS.RECORDER.Event(S.Planning);
 
 
 %% set keybinds
@@ -71,25 +75,124 @@ TextStim.size = 0.20;
 
 %% run the events
 
+% initialize / pre-allocate some vars
+EXIT = false;
+secs = GetSecs();
+icol_content = S.Planning.Get('content');
+
+% main loop
 for evt = 1 : S.Planning.count
 
     evt_name     = S.Planning.data{evt,S.Planning.icol_name    };
     evt_onset    = S.Planning.data{evt,S.Planning.icol_onset   };
     evt_duration = S.Planning.data{evt,S.Planning.icol_duration};
+    content      = S.Planning.data{evt,           icol_content };
+
+    if evt < S.Planning.count
+        next_evt_onset = S.Planning.data{evt+1,S.Planning.icol_onset};
+    end
 
     switch evt_name
+
         case 'START'
+
             FixationCross.Draw();
             Window.Flip();
             S.STARTtime = PTB_ENGINE.START(S.cfgKeybinds.Start, S.cfgKeybinds.Abort);
+            S.Event.AddStart();
+
+
         case 'END'
+
+
+        case 'Rest'
+
+            FixationCross.Draw();
+            real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
+            S.Event.AddStim(evt_name, evt_onset-S.STARTtime, []);
+
+            next_onset = S.STARTtime + next_evt_onset - Window.slack;
+            while secs < next_onset
+                [keyIsDown, secs, keyCode] = KbCheck();
+                if keyIsDown
+                    EXIT = keyCode(S.cfgKeybinds.Abort);
+                    if EXIT, break, end
+                end
+            end
+
+
+        case 'Instruction'
+
+            TextInstruction.Draw(content);
+            real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
+            S.Event.AddStim(evt_name, real_onset-S.STARTtime, []);
+
+            next_onset = S.STARTtime + next_evt_onset - Window.slack;
+            while secs < next_onset
+                [keyIsDown, secs, keyCode] = KbCheck();
+                if keyIsDown
+                    EXIT = keyCode(S.cfgKeybinds.Abort);
+                    if EXIT, break, end
+                end
+            end
+
+        case 'Delay'
+
+            real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
+            S.Event.AddStim(evt_name, real_onset-S.STARTtime, []);
+
+            % While loop for most of the duration of the event, so we can press ESCAPE
+            next_onset = S.STARTtime + next_evt_onset - Window.slack;
+            while secs < next_onset
+                [keyIsDown, secs, keyCode] = KbCheck();
+                if keyIsDown
+                    EXIT = keyCode(S.cfgKeybinds.Abort);
+                    if EXIT, break, end
+                end
+            end
+
+        case 'Stim'
+
+            TextStim.Draw(content);
+            real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
+            S.Event.AddStim(evt_name, real_onset-S.STARTtime, []);
+
+            % While loop for most of the duration of the event, so we can press ESCAPE
+            next_onset = S.STARTtime + next_evt_onset - Window.slack;
+            while secs < next_onset
+                [keyIsDown, secs, keyCode] = KbCheck();
+                if keyIsDown
+                    EXIT = keyCode(S.cfgKeybinds.Abort);
+                    if EXIT, break, end
+                end
+            end
+
+
         otherwise
             error('unknown event : %s', evt_name)
+
     end % switch
 
-end % evt
+    % if Abort is pressed
+    if EXIT
 
-WaitSecs(1);
+        % TODO : save stop time
+
+        if S.WriteFiles
+            save([S.OutFilepath '_ABORT_at_runtime.mat'], 'S')
+        end
+
+        fprintf(' !!! Abort key received !!! \n')
+        break % stop the forloop:evt
+
+    end
+
+end % forloop:evt
+
+
+%% End of task routine
+
 sca
-S
+
+
 end % fcn
