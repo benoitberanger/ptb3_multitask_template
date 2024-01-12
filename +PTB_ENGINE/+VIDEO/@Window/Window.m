@@ -107,6 +107,15 @@ classdef Window < handle
             end
         end % fcn
 
+        %------------------------------------------------------------------
+        function real_onset = Flip(self,target_onset)
+            if nargin < 2
+                target_onset = [];
+            end
+            Screen('DrawingFinished', self.ptr);
+            real_onset = Screen('Flip',self.ptr, target_onset);
+        end % fcn
+
     end % props
 
 

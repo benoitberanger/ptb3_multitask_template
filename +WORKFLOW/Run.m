@@ -53,9 +53,9 @@ S.guiTask        = GUI.GET.Task       ( hObject );
 
 %% Some warnings, and other stuff
 
-write_files = strcmp(S.guiACQmode, 'Acquisition') && S.guiSave;
+S.WriteFiles = strcmp(S.guiACQmode, 'Acquisition') && S.guiSave;
 
-if write_files
+if S.WriteFiles
     logger.warn('In `Acquisition` mode, data should be saved.')
 end
 
@@ -81,7 +81,7 @@ logger.log('Output file name  = %s', S.OutFilename)
 
 % Security : NEVER overwrite a file
 % If erasing a file is needed, we need to do it manually
-if write_files
+if S.WriteFiles
     if ~exist(S.SubjectDataDir, 'dir')
         mkdir(S.SubjectDataDir);
     end
@@ -104,8 +104,8 @@ if S.guiEyelink
     name_num              = randi(length(available_char),[1 eyelink_max_finename]); % Pick 8 numbers, from 1 to N=62 (same char can be picked twice)
     name_str              = available_char(name_num);                               % Convert the 8 numbers into char
 
-    S.guiEyelinkFile = name_str;
-    logger.log('Eyelink file name = %s', S.guiEyelinkFile)
+    S.EyelinkFile = name_str;
+    logger.log('Eyelink file name = %s', S.EyelinkFile)
 
 end
 
@@ -123,7 +123,7 @@ TASK.(S.guiTask).Run();
 
 %% Save data 'raw' data immediatly
 
-if write_files
+if S.WriteFiles
     save([S.OutFilepath '_RAW.mat'], 'S')
 end
 

@@ -1,6 +1,5 @@
 function Runtime()
 global S
-logger = getLogger();
 
 
 %% prepare events, timings, randomization
@@ -8,7 +7,20 @@ logger = getLogger();
 [S.Planning, S.cfgEvents] = TASK.(S.guiTask).PrepareEvents(S.guiACQmode);
 
 
-%% prepare graphic objects
+%% set keybinds
+
+cfg.Keybinds = TASK.cfgKeyboard(); % cross task keybinds
+
+switch S.guiKeybind
+    case 'fORP (MRI)'
+        cfg.Keybinds.Catch = KbName('b');
+    case 'Keyboard'
+        cfg.Keybinds.Catch = KbName('DownArrow');
+    otherwise
+end
+
+
+%% set parameters for rendering objects
 
 cfg.FixationCross = TASK.cfgFixationCross();
 
@@ -21,7 +33,8 @@ cfg.Text.Center          = [0.5 0.5];         % Position_px = [ScreenX_px Screen
 %% start PTB engine
 
 % get object
-S.Window = PTB_ENGINE.VIDEO.Window();
+Window = PTB_ENGINE.VIDEO.Window();
+S.Window = Window; % also save it in the global structure for diagnostic
 
 % task specific paramters
 S.Window.bg_color       = [0 0 0];
@@ -39,7 +52,7 @@ S.Window.Open();
 %% prepare rendering object
 
 FixationCross          = PTB_OBJECT.VIDEO.FixationCross();
-FixationCross.window   = S.Window;
+FixationCross.window   = Window;
 FixationCross.dim      = cfg.FixationCross.Size;
 FixationCross.width    = cfg.FixationCross.Width;
 FixationCross.color    = cfg.FixationCross.Color;
@@ -48,12 +61,33 @@ FixationCross.center_y = cfg.FixationCross.Position(2);
 FixationCross.GenerateCoords();
 
 TextInstruction        = PTB_OBJECT.VIDEO.CenteredText();
-TextInstruction.window = S.Window;
+TextInstruction.window = Window;
 TextInstruction.color  = cfg.FixationCross.Color;
 TextInstruction.size   = 0.10;
 
 TextStim      = TextInstruction.CopyObject();
 TextStim.size = 0.20;
+
+
+%% run the events
+
+for evt = 1 : S.Planning.count
+    
+    evt_name     = S.Planning.data{evt,S.Planning.icol_name    };
+    evt_onset    = S.Planning.data{evt,S.Planning.icol_onset   };
+    evt_duration = S.Planning.data{evt,S.Planning.icol_duration};
+    
+    switch evt_name
+        case 'START'
+            FixationCross.Draw();
+            Window.Flip();
+            t0 = PTB_ENGINE.START(cfg.Keybinds.Start, cfg.Keybinds.Abort);
+        case 'END'
+        otherwise
+            error('unknown event : %s', evt_name)
+    end % switch
+    
+end % evt
 
 WaitSecs(1);
 sca
