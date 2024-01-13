@@ -295,10 +295,9 @@ S.recEvent.ComputeDurations();
 % Diagnotic
 switch S.guiACQmode
     case 'Acquisition'
-    case 'Debug'
-        % plotDelay();
-    case 'FastDebug'
-        % plotDelay();
+    case {'Debug', 'FastDebug'}
+        assignin('base', 'S', S)
+        UTILS.plotDelay(S.recPlanning, S.recEvent);
 end
 
 end % fcn

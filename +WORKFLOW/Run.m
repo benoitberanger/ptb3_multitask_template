@@ -73,7 +73,7 @@ S.SubjectDataDir = UTILS.GET.SubjectDataDir(S.guiSubjectID);
 %% Generate base output filepath
 
 basename_norun = sprintf('%s_%s', S.guiSubjectID, S.guiTask );
-[S.RunName, S.RunNumber] = UTILS.GET.AppendRunNumber(S.SubjectDataDir, basename_norun);
+[S.RunName, S.RunNumber] = UTILS.AppendRunNumber(S.SubjectDataDir, basename_norun);
 
 S.OutFilename    = sprintf('%s_%s', S.TimeStampFile, S.RunName);
 S.OutFilepath    = fullfile(S.SubjectDataDir, S.OutFilename);
@@ -133,11 +133,7 @@ switch S.guiACQmode
             for i = 1:numel(exception.stack), exception.stack(i), end
         end
 
-    case 'Debug'
-        % no try/catch, because it's easier for debugging
-        TASK.(S.guiTask).Run();
-
-    case 'FastDebug'
+    case {'Debug', 'FastDebug'}
         % no try/catch, because it's easier for debugging
         TASK.(S.guiTask).Run();
 
