@@ -6,10 +6,12 @@ global S
 
 [S.recPlanning, S.cfgEvents] = TASK.(S.guiTask).PrepareEvents(S.guiACQmode);
 
+
 %% create other recorders
 
 S.recEvent     = UTILS.RECORDER.Event(S.recPlanning);
 S.recBehaviour = UTILS.RECORDER.Cell({'trial#' 'block#' 'stim#' 'content' 'iscatch' 'RT(s)' 'resp_ok'}, S.cfgEvents.nTrials);
+
 
 %% set keybinds
 
@@ -22,6 +24,9 @@ switch S.guiKeybind
         S.cfgKeybinds.Catch = KbName('DownArrow');
     otherwise
 end
+
+S.recKeylogger = UTILS.RECORDER.Keylogger(struct2array(S.cfgKeybinds));
+S.recKeylogger.Start();
 
 
 %% set parameters for rendering objects
@@ -170,7 +175,6 @@ for evt = 1 : S.recPlanning.count
                     EXIT = keyCode(S.cfgKeybinds.Abort);
                     if EXIT, break, end
 
-
                     if has_responded_stim
                         has_responded = 1;
                         break
@@ -291,6 +295,8 @@ end % forloop:evt
 
 sca
 S.recEvent.ComputeDurations();
+S.recKeylogger.Stop();
+S.recKeylogger.GetQueue();
 
 % Diagnotic
 switch S.guiACQmode

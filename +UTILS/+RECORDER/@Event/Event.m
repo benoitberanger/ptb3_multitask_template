@@ -16,6 +16,6 @@ classdef Event < UTILS.RECORDER.Stim
             self.description = class(self);
         end
 
-    end % methods
+    end % meths
 
 end % class

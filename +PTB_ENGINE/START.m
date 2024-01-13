@@ -12,15 +12,11 @@ switch S.guiACQmode
         HideCursor(S.guiScreenID);
 
         % print
-        fprintf(    '----------------------------------\n')
-        for ks = 1 : length(keyStart)
-            fprintf('      Waiting for trigger "%s"     \n', KbName(keyStart(ks)))
-        end
-        fprintf(    '                OR                 \n')
-        for ka = 1 : length(keyAbort)
-            fprintf('       Press "%s" to abort        \n', KbName(keyAbort(ka)))
-        end
-        fprintf(    '----------------------------------\n')
+        fprintf('----------------------------------\n')
+        fprintf('      Waiting for trigger "%s"    \n', KbName(keyStart))
+        fprintf('                OR                \n')
+        fprintf('       Press "%s" to abort        \n', KbName(keyAbort))
+        fprintf('----------------------------------\n')
 
         while 1
 
@@ -30,12 +26,12 @@ switch S.guiACQmode
                 continue
             end
 
-            if any(keyCode(keyStart))
+            if keyCode(keyStart)
                 fprintf(' ===> Start key received <=== \n')
                 break
             end
 
-            if any(keyCode(keyAbort))
+            if keyCode(keyAbort)
 
                 % sca -- Execute Screen('CloseAll'); WRAPPER
                 sca

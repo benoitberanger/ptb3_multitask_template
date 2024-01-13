@@ -23,6 +23,6 @@ classdef Planning < UTILS.RECORDER.Stim
             value = self.data{self.count, self.icol_onset} + self.data{self.count, self.icol_duration};
         end
 
-    end % methods
+    end % meths
 
 end % class

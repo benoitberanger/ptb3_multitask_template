@@ -3,7 +3,7 @@ function cfg = cfgKeyboard()
 
 KbName('UnifyKeyNames') % make keybinds cross-platform compatible
 
-cfg.Start = [KbName('t') KbName('s')];
+cfg.Start = KbName('t');
 cfg.Abort = KbName('escape');
 
 end % fcn
