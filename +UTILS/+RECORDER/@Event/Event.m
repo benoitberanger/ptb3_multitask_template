@@ -12,7 +12,7 @@ classdef Event < UTILS.RECORDER.Stim
         %------------------------------------------------------------------
         function self = Event(planning)
             assert(isa(planning, 'UTILS.RECORDER.Planning'))
-            self = self@UTILS.RECORDER.Stim(planning.count,planning.header_data)
+            self = self@UTILS.RECORDER.Stim(planning.count-2,planning.header_data)
             self.description = class(self);
         end
 

@@ -58,7 +58,7 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
             self.data(1:end-1,self.icol_duration) = num2cell( durations );   % Save durations
 
             % For the last event, usually `label_stop`, we need an exception.
-            if strcmp( self.data{end,self.icol_name} , self.label_stop )
+            if strcmp( self.data{end,self.icol_name} , self.label_end )
                 self.data{end,self.icol_duration} = 0;
             end
 

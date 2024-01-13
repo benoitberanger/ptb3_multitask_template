@@ -117,8 +117,31 @@ if isempty(result)
     logger.err('No `Run.m` file found to start the task `%s`. Expected path = %s', S.guiTask, fullfile(S.ProjectRootDir,'+TASK',sprintf('+%s',S.guiTask),'Run.m'))
     return
 end
+
 logger.log('Calling TASK.%s.Run()', S.guiTask)
-TASK.(S.guiTask).Run();
+
+switch S.guiACQmode
+
+    case 'Acquisition'
+        % call the Run() in a try/catch
+        try
+            TASK.(S.guiTask).Run();
+        catch exception
+            exception.message
+            exception.identifier
+            exception.cause
+            for i = 1:numel(exception.stack), exception.stack(i), end
+        end
+
+    case 'Debug'
+        % no try/catch, because it's easier for debugging
+        TASK.(S.guiTask).Run();
+
+    case 'FastDebug'
+        % no try/catch, because it's easier for debugging
+        TASK.(S.guiTask).Run();
+
+end
 
 
 %% Save data 'raw' data immediatly

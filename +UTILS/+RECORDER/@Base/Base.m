@@ -40,7 +40,7 @@ classdef (Abstract) Base < handle
 
         %------------------------------------------------------------------
         function ClearEmptyLines( self )
-            self.data = self.data(self.count+1:end,:);
+            self.data = self.data(1:self.count,:);
         end % fcn
 
         %------------------------------------------------------------------
