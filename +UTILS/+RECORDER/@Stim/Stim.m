@@ -182,7 +182,7 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
             end
 
             % Set the tick label to the event name
-            set( gca , 'YTickLabel' , {self.graph_data.name} )
+            set(gca , 'YTickLabel' , {self.graph_data.name} )
 
             % Not all versions of MATLAB have this option
             set(gca, 'TickLabelInterpreter', 'none')

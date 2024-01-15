@@ -11,11 +11,8 @@ function plotDelay( planning , event )
 %
 %  NOTES
 %  1. Time unit is millisecond (ms)
-%  2. Without input arguments, the function will try to use recPlanning, recEvent from the
-%  base workspace
 %
-%
-% See also UTILS.RECORDER.Event, UTILS.RECORDER.Planning, UTILS.plotStim
+% See also UTILS.RECORDER.Planning, UTILS.RECORDER.Event, UTILS.plotStim
 
 
 %% Check input data
@@ -23,13 +20,8 @@ function plotDelay( planning , event )
 % Must be 2 input arguments, or try with the base workspace
 assert(nargin == 2, '%s uses 2 input argument(s)', mfilename)
 
-if ~ isa ( planning , 'UTILS.RECORDER.Planning' )
-    error( 'First argument planning must be an object of class UTILS.RECORDER.Planning ' )
-end
-
-if ~ isa ( event , 'UTILS.RECORDER.Event' )
-    error( 'First argument event must be an object of class UTILS.RECORDER.Event ' )
-end
+assert( isa(planning,'UTILS.RECORDER.Planning'  ), 'planning must be an object of class UTILS.RECORDER.Planning'  )
+assert( isa(event    ,'UTILS.RECORDER.Event'    ), 'event must be an object of class UTILS.RECORDER.event'        )
 
 
 %% How many events can we use ?
@@ -79,18 +71,12 @@ end
 %% Plot
 
 % Command window display
-hdr = { 'event_name' 'p_ons (s)' 'r_ons (s)' 'd_ons (ms)' 'p_dur (s)' 'r_dur (s)' 'd_dur (ms)' };
-dsp = vertcat ( hdr ,  [...
-    event.data(1:range,1) num2cell(planned_onset) num2cell(recorded_onset) num2cell(onset_delay) ...
-    num2cell(planned_duration) num2cell(recorded_duration) num2cell(duration_delay) ...
-    ] );
-disp(dsp)
-
-% Input names
-all_ipn = [ inputname(1) ' + ' inputname(2) ];
+t = table(event.data(1:range,1), planned_onset, recorded_onset, onset_delay, planned_duration, recorded_duration, duration_delay);
+t.Properties.VariableNames = { 'event_name' 'p_ons (s)' 'r_ons (s)' 'd_ons (ms)' 'p_dur (s)' 'r_dur (s)' 'd_dur (ms)' };
+disp(t)
 
 % Figure
-figure('Name',[ mfilename ' : ' all_ipn ], 'NumberTitle','off')
+figure('Name',mfilename, 'NumberTitle','off')
 
 % --- First graph ---------------------------------------------------------
 graph_parts(1) = subplot(2,1,1);

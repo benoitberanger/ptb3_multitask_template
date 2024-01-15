@@ -303,15 +303,13 @@ switch S.guiACQmode
         TR = CONFIG.TR();
         n_volume = ceil((S.ENDtime-S.STARTtime)/TR);
         S.recKeylogger.GenerateMRITrigger(TR, n_volume, S.STARTtime)
-        S.recKeylogger.kb2data();
-        S.recKeylogger.ScaleTime(S.STARTtime);
 
-        % Diagnotic
-        switch S.guiACQmode
-            case 'Acquisition'
-            case {'Debug', 'FastDebug'}
-                assignin('base', 'S', S)
-                UTILS.plotDelay(S.recPlanning, S.recEvent);
-        end
+        UTILS.plotDelay(S.recPlanning, S.recEvent);
+        % UTILS.plotStim(S.recPlanning, S.recEvent, S.recKeylogger);
+end
+S.recKeylogger.kb2data();
+S.recKeylogger.ScaleTime(S.STARTtime);
+assignin('base', 'S', S)
+
 
 end % fcn
