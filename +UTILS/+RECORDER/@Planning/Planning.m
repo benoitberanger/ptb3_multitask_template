@@ -11,9 +11,8 @@ classdef Planning < UTILS.RECORDER.Stim
         %                           Constructor
         %------------------------------------------------------------------
         function self = Planning(nline,header_data)
-            if nargin < 2
-                header_data = {};
-            end
+            if nargin < 2, header_data = {}; end
+            if nargin < 1, nline = 0;        end
             self = self@UTILS.RECORDER.Stim(nline,header_data)
             self.description = class(self);
         end

@@ -4,7 +4,7 @@ classdef Event < UTILS.RECORDER.Stim
     properties(GetAccess = public, SetAccess = public)
         display_symbol = '+'
     end % properties
-    
+
     methods(Access = public)
 
         %------------------------------------------------------------------
