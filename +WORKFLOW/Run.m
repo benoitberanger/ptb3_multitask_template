@@ -147,14 +147,6 @@ if S.WriteFiles
 end
 
 
-%% Eyelink
-
-if S.guiEyelink
-    EYELINK.StopRecording();
-    EYELINK.CloseFile();
-end
-
-
 %% Save post-processing files
 
 logger.err('Save post-processing files: TODO')

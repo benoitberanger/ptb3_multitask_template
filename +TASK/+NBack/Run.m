@@ -23,6 +23,7 @@ switch S.guiKeybind
     case 'Keyboard'
         S.cfgKeybinds.Catch = KbName('DownArrow');
     otherwise
+        error('unknown S.guiKeybind : %s', S.guiKeybind)
 end
 
 S.recKeylogger = UTILS.RECORDER.Keylogger(S.cfgKeybinds);
@@ -53,7 +54,7 @@ S.Window.movie_filepath = [S.OutFilepath '.mov'];
 S.Window.screen_id      = S.guiScreenID; % mandatory
 S.Window.is_transparent = S.guiTransparent;
 S.Window.is_windowed    = S.guiWindowed;
-S.Window.is_recored     = S.guiRecordMovie;
+S.Window.is_recorded    = S.guiRecordMovie;
 
 S.Window.Open();
 
@@ -113,12 +114,14 @@ for evt = 1 : S.recPlanning.count
             Window.Flip();
             S.STARTtime = PTB_ENGINE.START(S.cfgKeybinds.Start, S.cfgKeybinds.Abort);
             S.recEvent.AddStart();
-
+            S.Window.AddFrameToMovie();
 
         case 'END'
 
             S.ENDtime = WaitSecs('UntilTime', S.STARTtime + evt_onset );
             S.recEvent.AddEnd(S.ENDtime - S.STARTtime );
+            S.Window.AddFrameToMovie();
+            PTB_ENGINE.END();
 
 
         case 'Rest'
@@ -126,6 +129,9 @@ for evt = 1 : S.recPlanning.count
             FixationCross.Draw();
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, []);
+
+            fprintf('Rest : %gs \n', evt_duration)
+            S.Window.AddFrameToMovie(evt_duration);
 
             next_onset = S.STARTtime + next_evt_onset - Window.slack;
             while secs < next_onset
@@ -143,6 +149,9 @@ for evt = 1 : S.recPlanning.count
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, []);
 
+            fprintf('Instruction : %gs --- %s \n', evt_duration, content);
+            S.Window.AddFrameToMovie(evt_duration);
+
             next_onset = S.STARTtime + next_evt_onset - Window.slack;
             while secs < next_onset
                 [keyIsDown, secs, keyCode] = KbCheck();
@@ -159,6 +168,7 @@ for evt = 1 : S.recPlanning.count
 
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, []);
+            S.Window.AddFrameToMovie(evt_duration);
 
             if skip_delay_check_catch
                 % i dont care if the ABORT section is also skipped for this event,
@@ -218,6 +228,7 @@ for evt = 1 : S.recPlanning.count
             TextStim.Draw(content);
             stim_real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, stim_real_onset-S.STARTtime, []);
+            S.Window.AddFrameToMovie(evt_duration);
 
             itrial  = S.recPlanning.data{evt,icol_trial  };
             iblock  = S.recPlanning.data{evt,icol_block  };
@@ -293,7 +304,8 @@ end % forloop:evt
 
 %% End of task routine
 
-sca
+S.Window.Close();
+
 S.recEvent.ComputeDurations();
 S.recKeylogger.GetQueue();
 S.recKeylogger.Stop();

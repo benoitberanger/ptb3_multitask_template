@@ -20,7 +20,7 @@ classdef Logger < handle
     end % meths
 
     properties(GetAccess = public, SetAccess = public)
-        padding (1,1) double {mustBeInteger, mustBeNonnegative} = 40;
+        padding (1,1) double {mustBeInteger, mustBeNonnegative} = 0;
     end % props
 
     methods(Access = public)

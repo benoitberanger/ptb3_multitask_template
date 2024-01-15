@@ -18,7 +18,7 @@ classdef Window < handle
         screen_id                double % mandatory, you need to be set by the user
         is_transparent    (1,1) logical = false;
         is_windowed       (1,1) logical = false;
-        is_recored        (1,1) logical = false;
+        is_recorded       (1,1) logical = false;
 
         % my suggestion of useful settings
         anti_aliazing     (1,1) double  = 4; % number of samples for multi-sample anti-aliazing
@@ -52,7 +52,7 @@ classdef Window < handle
             end
 
             % Use GStreamer : for videos
-            if self.is_recored
+            if self.is_recorded
                 Screen('Preference', 'OverrideMultimediaEngine', 1);
             end
 
@@ -101,10 +101,18 @@ classdef Window < handle
 
             logger.log('PTB window & rendring paramters set')
 
-            if self.is_recored
-                self.movie_ptr = Screen('CreateMovie', self.ptr, self.movie_filepath, [], [], self.fps);
+            if self.is_recorded
+                self.CreateMovie()
                 logger.log('Movie file opened : %s', self.movie_filepath)
             end
+        end % fcn
+
+        %------------------------------------------------------------------
+        function Close(self)
+            if self.is_recorded
+                self.FinalizeMovie();
+            end
+            Screen('Close', self.ptr);
         end % fcn
 
         %------------------------------------------------------------------
@@ -114,6 +122,34 @@ classdef Window < handle
             end
             Screen('DrawingFinished', self.ptr);
             real_onset = Screen('Flip',self.ptr, target_onset);
+        end % fcn
+
+        %------------------------------------------------------------------
+        function CreateMovie(self)
+            self.movie_ptr = Screen('CreateMovie', self.ptr, self.movie_filepath, [], [], self.fps);
+        end % fcn
+
+        %------------------------------------------------------------------
+        function FinalizeMovie(self)
+            Screen('FinalizeMovie', self.movie_ptr);
+        end % fcn
+
+        %------------------------------------------------------------------
+        function AddFrameToMovie(self, duration, buffer)
+            if ~self.is_recorded
+                return
+            end
+
+            if nargin < 2, duration = []           ; end
+            if nargin < 3, buffer   = 'frontBuffer'; end
+
+            if isempty(duration)
+                nframe = [];
+            else
+                nframe = round(duration/self.ifi);
+            end
+
+            Screen('AddFrameToMovie', self.ptr, [], buffer, self.movie_ptr, nframe);
         end % fcn
 
     end % props
