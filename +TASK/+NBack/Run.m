@@ -25,7 +25,7 @@ switch S.guiKeybind
     otherwise
 end
 
-S.recKeylogger = UTILS.RECORDER.Keylogger(struct2array(S.cfgKeybinds));
+S.recKeylogger = UTILS.RECORDER.Keylogger(S.cfgKeybinds);
 S.recKeylogger.Start();
 
 
@@ -297,15 +297,21 @@ sca
 S.recEvent.ComputeDurations();
 S.recKeylogger.GetQueue();
 S.recKeylogger.Stop();
-S.recKeylogger.kb2data();
-S.recKeylogger.ScaleTime(S.STARTtime);
-
-% Diagnotic
 switch S.guiACQmode
     case 'Acquisition'
     case {'Debug', 'FastDebug'}
-        assignin('base', 'S', S)
-        UTILS.plotDelay(S.recPlanning, S.recEvent);
-end
+        TR = CONFIG.TR();
+        n_volume = ceil((S.ENDtime-S.STARTtime)/TR);
+        S.recKeylogger.GenerateMRITrigger(TR, n_volume, S.STARTtime)
+        S.recKeylogger.kb2data();
+        S.recKeylogger.ScaleTime(S.STARTtime);
+
+        % Diagnotic
+        switch S.guiACQmode
+            case 'Acquisition'
+            case {'Debug', 'FastDebug'}
+                assignin('base', 'S', S)
+                UTILS.plotDelay(S.recPlanning, S.recEvent);
+        end
 
 end % fcn

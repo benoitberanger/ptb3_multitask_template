@@ -3,12 +3,14 @@ classdef Keylogger < UTILS.RECORDER.Stim
     %  (ex : record MRI triggers while other code is executing)
 
     properties(GetAccess = public, SetAccess = public)
+        keymap           struct = struct
         kbList_num (1,:) double
         kbList_str (1,:) cell
+        kbList_lbl (1,:) cell
         kbEvents   (:,3) cell
         keyboard         struct = struct
 
-        display_symbol = '+'
+        display_symbol = '*'
     end % props
 
     properties(GetAccess = public, SetAccess = protected)
@@ -22,12 +24,16 @@ classdef Keylogger < UTILS.RECORDER.Stim
         %------------------------------------------------------------------
         %                           Constructor
         %------------------------------------------------------------------
-        function self = Keylogger( kblist  )
-            self = self@UTILS.RECORDER.Stim(0,{})
+        function self = Keylogger( keymap  )
+            assert(isstruct(keymap) && isscalar(keymap), 'keymap must be a struct such as keymap.<keylabel>=KbName(<keyname>) ')
+
+            self = self@UTILS.RECORDER.Stim(0,{'KbName'})
             self.description = class(self);
 
-            self.kbList_num = kblist;
-            self.kbList_str = KbName(kblist);
+            self.keymap     = keymap;
+            self.kbList_num = struct2array(keymap);
+            self.kbList_str = KbName(self.kbList_num);
+            self.kbList_lbl = fieldnames(keymap);
 
             [self.keyboard.keyboardIndices, self.keyboard.productNames, self.keyboard.allInfos] = GetKeyboardIndices;
         end % fcn
@@ -67,7 +73,7 @@ classdef Keylogger < UTILS.RECORDER.Stim
                     [evt, ~] = KbEventGet(self.keyboard.keyboardIndices(index)); % Get all queued keys
                     if any( evt.Keycode == self.kbList_num )
                         key_idx = evt.Keycode == self.kbList_num;
-                        self.kbEvents(end+1,:) = { self.kbList_str{key_idx} evt.Time evt.Pressed };
+                        self.kbEvents(end+1,:) = { self.kbList_lbl{key_idx} evt.Time evt.Pressed };
                     end
                 end
 
@@ -84,10 +90,11 @@ classdef Keylogger < UTILS.RECORDER.Stim
             for i = 1 : length(kb_name)
 
                 % get all press for each key
-                sorted_kbEvents(i).name  = kb_name{i};
-                sorted_kbEvents(i).onset = cell2mat(self.kbEvents(idx_kb2evt == i, self.icol_konset));
-                sorted_kbEvents(i).press = cell2mat(self.kbEvents(idx_kb2evt == i, self.icol_kud   ));
-                sorted_kbEvents(i).n     = length(sorted_kbEvents(i).press);
+                sorted_kbEvents(i).name   = kb_name{i};
+                sorted_kbEvents(i).KbName = self.kbList_str(strcmp(kb_name{i}, self.kbList_lbl));
+                sorted_kbEvents(i).onset  = cell2mat(self.kbEvents(idx_kb2evt == i, self.icol_konset));
+                sorted_kbEvents(i).press  = cell2mat(self.kbEvents(idx_kb2evt == i, self.icol_kud   ));
+                sorted_kbEvents(i).n      = length(sorted_kbEvents(i).press);
 
                 % deal with special cases
                 is_n_even = mod(sorted_kbEvents(i).n,2)==0;
@@ -118,7 +125,8 @@ classdef Keylogger < UTILS.RECORDER.Stim
                     self.AddStim( ...
                         sorted_kbEvents(i).name, ...
                         sorted_kbEvents(i).onset(j*2-1), ...
-                        sorted_kbEvents(i).onset(j*2)-sorted_kbEvents(i).onset(j*2-1) ...
+                        sorted_kbEvents(i).onset(j*2)-sorted_kbEvents(i).onset(j*2-1), ...
+                        {sorted_kbEvents(i).KbName} ...
                         );
                 end % for:j
 
@@ -126,116 +134,27 @@ classdef Keylogger < UTILS.RECORDER.Stim
 
         end % fcn
 
-        % %------------------------------------------------------------------
-        % function ComputePulseSpacing( self , graph )
-        %     % self.ComputePulseSpacing() no plot, or self.ComputePulseSpacing(1) to plot
-        %     %
-        %     % Compute time between each "KeyIsDown", then plot it if asked
-        %
-        %     if ~exist('graph','var')
-        %         graph = 0;
-        %     end
-        %
-        %     for k = 1 : size(self.kbEvents,1)
-        %
-        %         if ~isempty(self.kbEvents{k,2})
-        %
-        %             if isempty(self.kbEvents{k,2}{end,end})
-        %                 self.kbEvents{k,2}{end,end} = 0;
-        %             end
-        %
-        %             data = cell2mat(self.kbEvents{k,2});
-        %
-        %             KeyIsDown_idx = data(:,2) == 1;
-        %             KeyIsDown_onset = data(KeyIsDown_idx,1);
-        %             KeyIsDown_spacing = diff(KeyIsDown_onset);
-        %
-        %             fprintf('N = %d \n',length(KeyIsDown_onset));
-        %             fprintf('mean = %f ms \n',mean(KeyIsDown_spacing)*1000);
-        %             fprintf('std = %f ms \n',std(KeyIsDown_spacing)*1000);
-        %
-        %             if graph
-        %
-        %                 figure( ...
-        %                     'Name'        , [mfilename ' : ' self.kbEvents{k,1} ] , ...
-        %                     'NumberTitle' , 'off'                                      )
-        %
-        %                 subplot(2,2,[1 2])
-        %                 plot(KeyIsDown_spacing)
-        %
-        %                 subplot(2,2,3)
-        %                 hist(KeyIsDown_spacing)
-        %
-        %                 if ~isempty(which('boxplot'))
-        %                     subplot(2,2,4)
-        %                     boxplot(KeyIsDown_spacing)
-        %                     grid on
-        %                 end
-        %
-        %             end
-        %
-        %         end
-        %
-        %     end
-        %
-        % end % fcn
+        %------------------------------------------------------------------
+        function GenerateMRITrigger( self , tr, n_volume, starttime )
+            % Generate MRI trigger according to he given number of Volumes
+            % and the TR.
 
-        % %------------------------------------------------------------------
-        % function GenerateMRITrigger( self , tr, volumes, starttime )
-        %     % self.GenerateMRITrigger( TR = positive number , Volumes = positive integer, StartTime = onset of the first volume )
-        %     %
-        %     % Generate MRI trigger according to he given number of Volumes
-        %     % and the TR.
-        %
-        %     % ================ Check input argument =======================
-        %
-        %     % narginchk(3,3)
-        %     % narginchk introduced in R2011b
-        %     if nargin > 4 || nargin < 3
-        %         error('%s uses 3 or 4 input argument(s)','GenerateMRITrigger')
-        %     end
-        %
-        %     if nargin == 3
-        %         starttime = 0;
-        %     end
-        %
-        %     % --- tr ----
-        %     if ~( isnumeric(tr) && tr > 0 )
-        %         error('TR must be positive')
-        %     end
-        %
-        %     % --- volumes ----
-        %     if ~( isnumeric(volumes) && volumes > 0 && volumes == round(volumes) )
-        %         error('Volumes must be a positive integer')
-        %     end
-        %
-        %     % --- starttime ----
-        %     if ~( isnumeric(starttime) && starttime >= 0 )
-        %         error('StartTime must be positive or null')
-        %     end
-        %
-        %
-        %     % ======================= Callback ============================
-        %
-        %     % MRI_trigger_tag = '5%'; % fORP in USB
-        %     MRI_trigger_tag = self.Header{1};
-        %     pulse_duration = 0.020; % seconds
-        %
-        %     % Check if TR is compatible with the pulse duration
-        %     if tr < pulse_duration
-        %         error('pulse_duration is set to %.3f, but TR must be such as TR > pulse_duration',pulse_duration)
-        %     end
-        %
-        %     % Fill Data whith MRI trigger events
-        %
-        %     for v = 1 : volumes
-        %
-        %         self.AddEvent({ MRI_trigger_tag starttime+(v-1)*tr                1 starttime+(v-1)*tr                 })
-        %         self.AddEvent({ MRI_trigger_tag starttime+(v-1)*tr+pulse_duration 0 starttime+(v-1)*tr+pulse_duration  })
-        %
-        %     end
-        %
-        % end % fcn
+            assert( isnumeric(tr) && tr > 0 , 'TR must be positive')
+            assert( isnumeric(n_volume) && n_volume > 0 && n_volume == round(n_volume) , 'Volumes must be a positive integer')
+            assert( isnumeric(starttime) && starttime >= 0 , 'StartTime must be positive or null')
+
+            MRI_trigger_tag = 'MRItrigger';
+            pulse_duration = 0.020; % seconds
+
+            % Check if TR is compatible with the pulse duration
+            assert(tr > pulse_duration, 'pulse_duration is set to %.3f, but TR must be such as TR > pulse_duration',pulse_duration)
+
+            % Fill Data whith MRI trigger events
+            for v = 1 : n_volume
+                self.AddStim(MRI_trigger_tag, starttime + tr*(v-1), pulse_duration, {MRI_trigger_tag});
+            end
+
+        end % fcn
 
     end % meths
 
