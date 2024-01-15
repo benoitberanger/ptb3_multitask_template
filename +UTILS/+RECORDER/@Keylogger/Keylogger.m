@@ -75,65 +75,56 @@ classdef Keylogger < UTILS.RECORDER.Stim
 
         end % fcn
 
+        %------------------------------------------------------------------
+        function kb2data(self)
+            [ kb_name , ~ , idx_kb2evt ] = unique(self.kbEvents(:,self.icol_kname), 'stable');
 
+            sorted_kbEvents = struct;
 
-        % %------------------------------------------------------------------
-        % function ComputeDurations( self )
-        %     % self.ComputeDurations()
-        %     %
-        %     % Compute durations for each keybinds
-        %
-        %     kbevents = cell( length(self.Header) , 2 );
-        %
-        %     % Take out T_start and T_stop from Data
-        %
-        %     T_start_idx = strcmp( self.Data(:,1) , 'StartTime' );
-        %     T_stop_idx = strcmp( self.Data(:,1) , 'StopTime' );
-        %
-        %     data = self.Data( ~( T_start_idx + T_stop_idx ) , : );
-        %
-        %     % Create list for each KeyBind
-        %
-        %     [ unique_kb , ~ ,  idx ] = unique(self.Data(:,1), 'stable'); % Filter each Kb
-        %
-        %     % Re-order each input to be coherent with Header order
-        %     input_found = nan(size(unique_kb));
-        %     for c = 1:length(unique_kb)
-        %
-        %         input_idx  = strcmp(self.Header,unique_kb(c));
-        %         input_idx  = find(input_idx);
-        %
-        %         input_found(c) = input_idx;
-        %
-        %     end
-        %
-        %     kbevents(:,1) = self.Header; % Name of KeyBind
-        %
-        %     count = 0;
-        %
-        %     for c = 1:length(unique_kb)
-        %
-        %         count = count + 1;
-        %
-        %         kbevents{ input_found(count) , 2 } = data( idx == c , [4 3] ); % Time & Up/Down of Keybind
-        %
-        %     end
-        %
-        %     % Compute the difference between each time
-        %     for e = 1 : size( kbevents , 1 )
-        %
-        %         if size( kbevents{e,2} , 1 ) > 1
-        %
-        %             time = cell2mat( kbevents {e,2} (:,1) );                       % Get the times
-        %             kbevents {e,2} ( 1:end-1 , end+1 ) = num2cell( diff( time ) ); % Compute the differences
-        %
-        %         end
-        %
-        %     end
-        %
-        %     self.kbEvents = kbevents;
-        %
-        % end % fcn
+            for i = 1 : length(kb_name)
+
+                % get all press for each key
+                sorted_kbEvents(i).name  = kb_name{i};
+                sorted_kbEvents(i).onset = cell2mat(self.kbEvents(idx_kb2evt == i, self.icol_konset));
+                sorted_kbEvents(i).press = cell2mat(self.kbEvents(idx_kb2evt == i, self.icol_kud   ));
+                sorted_kbEvents(i).n     = length(sorted_kbEvents(i).press);
+
+                % deal with special cases
+                is_n_even = mod(sorted_kbEvents(i).n,2)==0;
+                is_first_press_down = sorted_kbEvents(i).press(1) == 1;
+                if is_first_press_down && is_n_even
+                    % easy, should happen most of the time
+                    % pass
+                elseif is_first_press_down && ~is_n_even
+                    % last relasease not recorded, but thats ok...
+                    sorted_kbEvents(i).onset(end+1) = Inf;
+                    sorted_kbEvents(i).press(end+1) = 0;
+                    sorted_kbEvents(i).n = sorted_kbEvents(i).n + 1;
+                elseif ~is_first_press_down && is_n_even
+                    % delete first & manage last
+                    sorted_kbEvents(i).onset(1) = [];
+                    sorted_kbEvents(i).press(1) = [];
+                    sorted_kbEvents(i).onset(end+1) = Inf;
+                    sorted_kbEvents(i).press(end+1) = 0;
+                elseif ~is_first_press_down && ~is_n_even
+                    % delete first and we are all good
+                    sorted_kbEvents(i).onset(1) = [];
+                    sorted_kbEvents(i).press(1) = [];
+                    sorted_kbEvents(i).n = sorted_kbEvents(i).n - 1;
+                end
+
+                % everything is clean, ready to add in the data
+                for j = 1 : sorted_kbEvents(i).n / 2
+                    self.AddStim( ...
+                        sorted_kbEvents(i).name, ...
+                        sorted_kbEvents(i).onset(j*2-1), ...
+                        sorted_kbEvents(i).onset(j*2)-sorted_kbEvents(i).onset(j*2-1) ...
+                        );
+                end % for:j
+
+            end % for:i
+
+        end % fcn
 
         % %------------------------------------------------------------------
         % function ComputePulseSpacing( self , graph )
@@ -245,10 +236,6 @@ classdef Keylogger < UTILS.RECORDER.Stim
         %     end
         %
         % end % fcn
-
-
-
-
 
     end % meths
 

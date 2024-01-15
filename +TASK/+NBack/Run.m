@@ -295,8 +295,10 @@ end % forloop:evt
 
 sca
 S.recEvent.ComputeDurations();
-S.recKeylogger.Stop();
 S.recKeylogger.GetQueue();
+S.recKeylogger.Stop();
+S.recKeylogger.kb2data();
+S.recKeylogger.ScaleTime(S.STARTtime);
 
 % Diagnotic
 switch S.guiACQmode
