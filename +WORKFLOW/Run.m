@@ -1,39 +1,34 @@
 function Run( hObject, ~ )
 % Here is the main workflow, where everythging happens
 % --- in the GUI, click on task button
-% - Retrieve GUI paramters
-% - Set most of the variables
-% - Start PTB3 components (video, audio, keyboard, ...)
-% - Start task Runtime()
+% - Retrieve GUI parameters
+% - Set most of the variables : data path, current run number, output filename, eyelink filename, ...
+% - Start task Run()
 % - Save 'raw' data immediately after the end of task
 % - Perform post-task operations : generate models for SPM, print run performances, ...
-% - Save all files
+% - Save all files (if necessary)
 % --- ready for another run
 
 clc
 sca
-rng('shuffle')
-logger = getLogger();
-
-
-%% Retrieve GUI data
-
-handles = guidata( hObject );
+rng('shuffle') % to make sure each time a task is started the rand* functions will use a new random seed
+logger = getLogger(); % my logging object, used everywhere, except at runtime
+handles = guidata( hObject ); % Retrieve GUI data
 
 
 %% Initialize the main structure
 
 % NOTES : Here I made the choice of using a "global" variable, because it
 % simplifies a lot all the functions. It allows retrieve of the variable
-% everywhere, and make lighter the input
+% everywhere, and make lighter the input/output parameters
 
 global S
 S                 = struct; % S is the main structure, containing everything useful, and used everywhere
 S.ProjectName     = CONFIG.ProjectName();
 S.ProjectRootDir  = UTILS.GET.RootDir();
 S.ProjectDataDir  = UTILS.GET.DataDir();
-S.TimeStampSimple = datestr(now, 'yyyy-mm-dd HH:MM'); % readable
-S.TimeStampFile   = datestr(now, 30                ); % yyyymmddTHHMMSS : to sort automatically by time of creation
+S.TimeStampSimple = datestr(now, 'yyyy-mm-dd HH:MM:SS'); % readable
+S.TimeStampFile   = datestr(now, 'yyyymmddTHHMMSS'    ); % to sort automatically files by time of creation
 
 
 %% Lots of get*
@@ -128,10 +123,16 @@ switch S.guiACQmode
         try
             TASK.(S.guiTask).Run();
         catch exception
-            exception.message
-            exception.identifier
-            exception.cause
-            for i = 1:numel(exception.stack), exception.stack(i), end
+            % Abort at START ?
+            if ~isempty(strfind(exception.message, 'Abort')) && ~isempty(strfind(exception.stack(1).name, 'START'))
+                return
+            end
+
+            % No ? then try to continue
+            disp(exception)
+            for i = 1:numel(exception.stack)
+                disp(exception.stack(i))
+            end
         end
 
     case {'Debug', 'FastDebug'}

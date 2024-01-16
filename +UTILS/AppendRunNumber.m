@@ -1,6 +1,6 @@
 function [name, run_number] = AppendRunNumber(SubjectDataDir, BasePattern)
 
-if exist(SubjectDataDir, 'dir') ~= 7 % no dir
+if ~exist(SubjectDataDir, 'dir') % no dir
     run_number = 1;
     name = GenBasename(BasePattern,run_number);
     return

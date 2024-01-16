@@ -294,7 +294,7 @@ for evt = 1 : S.recPlanning.count
             save([S.OutFilepath '_ABORT_at_runtime.mat'], 'S')
         end
 
-        fprintf(' !!! Abort key received !!! \n')
+        fprintf('!!! @%s : Abort key received !!!\n', mfilename)
         break % stop the forloop:evt
 
     end

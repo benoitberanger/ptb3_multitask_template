@@ -44,9 +44,11 @@ switch S.guiACQmode
 
                 % dump global S in a .mat file, for diagnostic
                 if S.WriteFiles
-                    save([S.OutFilepath '_ABORT_before_START.mat'], 'S')
+                    fpath_abort = [S.OutFilepath '_ABORT_before_START.mat'];
+                    save(fpath_abort, 'S')
+                    fprintf('saved abort before start file : %s\n', fpath_abort)
                 end
-                error(' !!! Abort key received !!! ')
+                error('!!! @%s : Abort key received !!!', mfilename)
             end
 
         end
