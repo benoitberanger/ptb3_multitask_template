@@ -128,7 +128,7 @@ for evt = 1 : S.recPlanning.count
 
             FixationCross.Draw();
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
-            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, []);
+            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
 
             fprintf('Rest : %gs \n', evt_duration)
             S.Window.AddFrameToMovie(evt_duration);
@@ -147,7 +147,7 @@ for evt = 1 : S.recPlanning.count
 
             TextInstruction.Draw(content);
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
-            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, []);
+            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
 
             fprintf('Instruction : %gs --- %s \n', evt_duration, content);
             S.Window.AddFrameToMovie(evt_duration);
@@ -167,7 +167,7 @@ for evt = 1 : S.recPlanning.count
         case 'Delay'
 
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
-            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, []);
+            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
             S.Window.AddFrameToMovie(evt_duration);
 
             if skip_delay_check_catch
@@ -227,7 +227,7 @@ for evt = 1 : S.recPlanning.count
 
             TextStim.Draw(content);
             stim_real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
-            S.recEvent.AddStim(evt_name, stim_real_onset-S.STARTtime, []);
+            S.recEvent.AddStim(evt_name, stim_real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
             S.Window.AddFrameToMovie(evt_duration);
 
             itrial  = S.recPlanning.data{evt,icol_trial  };

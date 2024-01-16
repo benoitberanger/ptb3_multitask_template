@@ -83,6 +83,9 @@ classdef Keylogger < UTILS.RECORDER.Stim
 
         %------------------------------------------------------------------
         function kb2data(self)
+            self.data = cell( self.n_lin , self.n_col);
+            self.count = 0;
+            
             [ kb_name , ~ , idx_kb2evt ] = unique(self.kbEvents(:,self.icol_kname), 'stable');
 
             sorted_kbEvents = struct;
@@ -126,7 +129,7 @@ classdef Keylogger < UTILS.RECORDER.Stim
                         sorted_kbEvents(i).name, ...
                         sorted_kbEvents(i).onset(j*2-1), ...
                         sorted_kbEvents(i).onset(j*2)-sorted_kbEvents(i).onset(j*2-1), ...
-                        {sorted_kbEvents(i).KbName} ...
+                        sorted_kbEvents(i).KbName ...
                         );
                 end % for:j
 

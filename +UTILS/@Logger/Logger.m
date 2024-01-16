@@ -86,6 +86,10 @@ classdef Logger < handle
 
         function str = getCaller()
             stack = dbstack(3,'-completenames');
+            if isempty(stack)
+                str = '';
+                return
+            end
 
             % basic cleaning
             str = strrep(stack(1).file, UTILS.GET.RootDir(),'');

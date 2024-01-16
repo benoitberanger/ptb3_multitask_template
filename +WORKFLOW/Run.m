@@ -79,12 +79,13 @@ S.OutFilename    = sprintf('%s_%s', S.TimeStampFile, S.RunName);
 S.OutFilepath    = fullfile(S.SubjectDataDir, S.OutFilename);
 logger.log('Output file name  = %s', S.OutFilename)
 
-% Security : NEVER overwrite a file
-% If erasing a file is needed, we need to do it manually
 if S.WriteFiles
     if ~exist(S.SubjectDataDir, 'dir')
         mkdir(S.SubjectDataDir);
     end
+    % Security : NEVER overwrite a file
+    % If erasing a file is needed, you need to do it manually
+    % but this should not happen with the timestamp which is unique
     logger.assert( ~exist([S.OutFilepath '.mat'],'file'), 'The file %s.mat already exists', [S.OutFilepath '.mat'] );
 end
 
@@ -95,7 +96,7 @@ if S.guiEyelink
 
     eyelink_detected = ~isempty(which('Eyelink.m'));
     if ~eyelink_detected, logger.err('No `Eyelink.m` detected in MATLAB path.')       , return, end
-    if ~S.guiSave          , logger.err('Save data MUST be turned on when using Eyelink'), return, end
+    if ~S.guiSave       , logger.err('Save data MUST be turned on when using Eyelink'), return, end
     if ~EYELINK.IsConnected()                                                         , return, end % log message is inside the function
 
     % Generate the Eyelink filename
@@ -143,13 +144,23 @@ end
 %% Save data 'raw' data immediatly
 
 if S.WriteFiles
-    save([S.OutFilepath '_RAW.mat'], 'S')
+    fpath_raw = [S.OutFilepath '_RAW.mat'];
+    save(fpath_raw, 'S')
+    logger.log('saved RAW file : %s', fpath_raw)
 end
 
 
 %% Save post-processing files
 
-logger.err('Save post-processing files: TODO')
+if exist(fullfile('+TASK',['+' S.guiTask],'Generate_SPM_NamesOnsetsDurations_block.m'),'file')
+    [names, onsets, durations] = TASK.(S.guiTask).Generate_SPM_NamesOnsetsDurations_block();
+
+    if S.WriteFiles
+        fpath_spm_block = [S.OutFilepath '_SPM_block.mat'];
+        save(fpath_spm_block, 'names', 'onsets', 'durations'); % light weight file with only the onsets for SPM
+        logger.log('saved SPM `block` file : %s', fpath_spm_block)
+    end
+end
 
 
 %% Ready for another run
