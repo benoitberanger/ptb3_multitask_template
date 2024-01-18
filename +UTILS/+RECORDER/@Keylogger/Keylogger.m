@@ -79,13 +79,17 @@ classdef Keylogger < UTILS.RECORDER.Stim
 
             end
 
+            if size(self.kbEvents,1) == 0
+                warning('empty kbEvents')
+            end
+
         end % fcn
 
         %------------------------------------------------------------------
         function kb2data(self)
             self.data = cell( self.n_lin , self.n_col);
             self.count = 0;
-            
+
             [ kb_name , ~ , idx_kb2evt ] = unique(self.kbEvents(:,self.icol_kname), 'stable');
 
             sorted_kbEvents = struct;
