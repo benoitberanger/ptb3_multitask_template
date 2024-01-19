@@ -72,12 +72,16 @@ Tetris3D.InitializeOpenGL();
 Tetris3D.GenCubeTexture();
 Tetris3D.PrepareNormal();
 
-Tetris3D.Render([1 2 3 1], 0, false);
+tetris    = [1 2 3 2];
+angle     = 0;
+is_mirror = true;
 
+Tetris3D.DoubleRenderHack(tetris, angle, is_mirror);
+FixationCross.Draw();
 Window.Flip();
 
 KbWait();
-Tetris3D.DeleteTextures();
+Tetris3D.DeleteCubeTextures();
 sca
 return
 
