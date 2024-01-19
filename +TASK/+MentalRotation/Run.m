@@ -98,7 +98,6 @@ icol_condition = S.recPlanning.Get('condition');
 icol_tetris    = S.recPlanning.Get('tetris');
 prev_onset    = [];
 prev_duration = [];
-has_responded = false;
 subj_resp = '';
 n_resp_ok = 0;
 
@@ -106,7 +105,7 @@ n_resp_ok = 0;
 for evt = 1 : S.recPlanning.count
 
     evt_name      = S.recPlanning.data{evt,S.recPlanning.icol_name     };
-    evt_onset     = S.recPlanning.data{evt,S.recPlanning.icol_onset    };
+    % evt_onset     = S.recPlanning.data{evt,S.recPlanning.icol_onset    };
     evt_duration  = S.recPlanning.data{evt,S.recPlanning.icol_duration };
     evt_trial     = S.recPlanning.data{evt,              icol_itrial   };
     evt_angle     = S.recPlanning.data{evt,              icol_angle    };

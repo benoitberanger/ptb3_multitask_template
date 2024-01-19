@@ -93,4 +93,9 @@ onsets   {name2idx.Click} = cell2mat(S.recKeylogger.data(idx,S.recKeylogger.icol
 durations{name2idx.Click} = cell2mat(S.recKeylogger.data(idx,S.recKeylogger.icol_duration));
 
 
+%% Debuging
+
+% UTILS.plotSPMnod(names, onsets, durations)
+
+
 end % fcn
