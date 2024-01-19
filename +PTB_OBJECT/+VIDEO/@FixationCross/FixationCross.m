@@ -21,7 +21,7 @@ classdef FixationCross < PTB_OBJECT.VIDEO.Base
 
     methods(Access = public)
 
-        %------------------------------------------------------------------
+        %--- constructor --------------------------------------------------
         function self = FixationCross()
             % pass
         end % fcn

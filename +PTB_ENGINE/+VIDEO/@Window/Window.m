@@ -38,6 +38,12 @@ classdef Window < handle
             logger = getLogger();
             logger.log('Preparing PTB window')
             clear Screen % reset all cashed PTB screen settings
+            
+            % Call this function at the beginning of your experiment script before
+            % calling *any* Psychtoolbox Screen() command, if you intend to use
+            % low-level OpenGL drawing commands in your script as provided by
+            % Richard Murrays moglcore extension.
+            InitializeMatlabOpenGL();
 
             if isempty(self.screen_id)
                 logger.err('screen_id not set, opening a window in debug mode : windowed & transparent ')
