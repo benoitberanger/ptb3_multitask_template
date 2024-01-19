@@ -318,6 +318,9 @@ classdef Tetris3D < PTB_OBJECT.VIDEO.Base
 
         %------------------------------------------------------------------
         function DoubleRenderHack(self, tetris, angle, is_mirror)
+            % Perspective hack : render L at center of screen, save
+            % image, render R at center of screen, save image, re-draw
+            % both on Left and Right side of the screen
             self.Render (tetris,     0,         0);
             self.Capture('L');
             self.Render (tetris, angle, is_mirror);

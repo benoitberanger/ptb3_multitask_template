@@ -10,7 +10,7 @@ global S
 %% create other recorders
 
 S.recEvent     = UTILS.RECORDER.Event(S.recPlanning);
-%S.recBehaviour = UTILS.RECORDER.Cell({'trial#' 'block#' 'stim#' 'content' 'iscatch' 'RT(s)' 'resp_ok'}, S.cfgEvents.nTrials);
+S.recBehaviour = UTILS.RECORDER.Cell({'trial#' 'condition' 'angle(deg)' 'tetris[4]' 'RT(s)' 'subj_resp' 'resp_ok'}, S.cfgEvents.nTrials);
 
 
 %% set keybinds
@@ -19,9 +19,11 @@ S.cfgKeybinds = TASK.cfgKeyboard(); % cross task keybinds
 
 switch S.guiKeybind
     case 'fORP (MRI)'
-        %S.cfgKeybinds.Catch = KbName('b');
+        S.cfgKeybinds.Same   = KbName('b');
+        S.cfgKeybinds.Mirror = KbName('y');
     case 'Keyboard'
-        %S.cfgKeybinds.Catch = KbName('DownArrow');
+        S.cfgKeybinds.Same   = KbName('RightArrow');
+        S.cfgKeybinds.Mirror = KbName('LeftArrow');
     otherwise
         error('unknown S.guiKeybind : %s', S.guiKeybind)
 end
@@ -72,40 +74,44 @@ Tetris3D.InitializeOpenGL();
 Tetris3D.GenCubeTexture();
 Tetris3D.PrepareNormal();
 
-tetris    = [1 2 3 2];
-angle     = 0;
-is_mirror = true;
-
-Tetris3D.DoubleRenderHack(tetris, angle, is_mirror);
-FixationCross.Draw();
-Window.Flip();
-
-KbWait();
-Tetris3D.DeleteCubeTextures();
-sca
-return
+% tetris    = [1 2 3 2];
+% angle     = 0;
+% is_mirror = true;
+%
+% Tetris3D.DoubleRenderHack(tetris, angle, is_mirror);
+% FixationCross.Draw();
+% Window.Flip();
+%
+% KbWait();
+% Tetris3D.DeleteCubeTextures();
+% sca
+% return
 
 %% run the events
 
 % initialize / pre-allocate some vars
 EXIT = false;
 secs = GetSecs();
-% icol_trial   = S.recPlanning.Get('trial'  );
-% icol_block   = S.recPlanning.Get('block'  );
-% icol_stim    = S.recPlanning.Get('stim'   );
-% icol_content = S.recPlanning.Get('content');
-% icol_iscatch = S.recPlanning.Get('iscatch');
+icol_itrial    = S.recPlanning.Get('iTrial');
+icol_angle     = S.recPlanning.Get('angle');
+icol_condition = S.recPlanning.Get('condition');
+icol_tetris    = S.recPlanning.Get('tetris');
+prev_onset    = [];
+prev_duration = [];
+has_responded = false;
+subj_resp = '';
+n_resp_ok = 0;
 
 % main loop
 for evt = 1 : S.recPlanning.count
 
-    evt_name     = S.recPlanning.data{evt,S.recPlanning.icol_name    };
-    evt_onset    = S.recPlanning.data{evt,S.recPlanning.icol_onset   };
-    evt_duration = S.recPlanning.data{evt,S.recPlanning.icol_duration};
-
-    if evt < S.recPlanning.count
-        next_evt_onset = S.recPlanning.data{evt+1,S.recPlanning.icol_onset};
-    end
+    evt_name      = S.recPlanning.data{evt,S.recPlanning.icol_name     };
+    evt_onset     = S.recPlanning.data{evt,S.recPlanning.icol_onset    };
+    evt_duration  = S.recPlanning.data{evt,S.recPlanning.icol_duration };
+    evt_trial     = S.recPlanning.data{evt,              icol_itrial   };
+    evt_angle     = S.recPlanning.data{evt,              icol_angle    };
+    evt_condition = S.recPlanning.data{evt,              icol_condition};
+    evt_tetris    = S.recPlanning.data{evt,              icol_tetris   };
 
     switch evt_name
 
@@ -117,9 +123,10 @@ for evt = 1 : S.recPlanning.count
             S.recEvent.AddStart();
             S.Window.AddFrameToMovie();
 
+
         case 'END'
 
-            S.ENDtime = WaitSecs('UntilTime', S.STARTtime + evt_onset );
+            S.ENDtime = WaitSecs('UntilTime', prev_onset + prev_duration );
             S.recEvent.AddEnd(S.ENDtime - S.STARTtime );
             S.Window.AddFrameToMovie();
             PTB_ENGINE.END();
@@ -128,19 +135,95 @@ for evt = 1 : S.recPlanning.count
         case 'Rest'
 
             FixationCross.Draw();
-            real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
+            real_onset = Window.Flip();
+            prev_onset = real_onset;
+            prev_duration = evt_duration;
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
 
-            fprintf('Rest : %gs \n', evt_duration)
             S.Window.AddFrameToMovie(evt_duration);
 
-            next_onset = S.STARTtime + next_evt_onset - Window.slack;
+            next_onset = real_onset + evt_duration - Window.slack;
             while secs < next_onset
                 [keyIsDown, secs, keyCode] = KbCheck();
                 if keyIsDown
                     EXIT = keyCode(S.cfgKeybinds.Abort);
                     if EXIT, break, end
                 end
+            end
+
+
+        case 'Trial'
+
+            switch evt_condition
+                case 'same'
+                    evt_is_mirror = false;
+                case 'mirror'
+                    evt_is_mirror = true;
+                otherwise
+                    error('???')
+            end
+            Tetris3D.DoubleRenderHack(evt_tetris, evt_angle, evt_is_mirror);
+            FixationCross.Draw();
+            real_onset = Window.Flip(prev_onset + prev_duration  - Window.slack);
+            prev_onset = real_onset;
+            prev_duration = evt_duration;
+            S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
+
+            fprintf('#trial=%3d/%3d   angle=%3d   condition=%6s   tetris=%s   ',...
+                evt_trial,...
+                S.cfgEvents.nTrials,...
+                evt_angle,...
+                evt_condition,...
+                num2str(evt_tetris, repmat('%+2d ', [1 length(evt_tetris)])) ...
+                )
+
+            has_responded = false;
+
+            next_onset = real_onset + evt_duration - Window.slack;
+            while secs < next_onset
+                [keyIsDown, secs, keyCode] = KbCheck();
+                if keyIsDown
+                    EXIT = keyCode(S.cfgKeybinds.Abort);
+                    if EXIT, break, end
+
+                    if keyCode(S.cfgKeybinds.Same)
+                        has_responded = true;
+                        subj_resp = 'same';
+                    end
+                    if keyCode(S.cfgKeybinds.Mirror)
+                        has_responded = true;
+                        subj_resp = 'mirror';
+                    end
+
+                    if has_responded
+                        RT = secs - real_onset;
+                        is_resp_ok = strcmp(subj_resp, evt_condition);
+                        n_resp_ok = n_resp_ok + is_resp_ok;
+                        S.recBehaviour.AddLine({evt_trial evt_condition evt_angle evt_tetris RT subj_resp is_resp_ok})
+
+                        fprintf('RT=%5.fms   subj_resp=%6s   is_resp_ok=%2d (%3d%%)\n',...
+                            round(RT * 1000),...
+                            subj_resp,...
+                            is_resp_ok,...
+                            round(100*n_resp_ok / evt_trial) ...
+                            )
+
+                        S.Window.AddFrameToMovie(RT);
+                        break
+                    end
+
+                end
+            end % while
+
+            if ~has_responded
+                S.recBehaviour.AddLine({evt_trial evt_condition evt_angle evt_tetris -1 '' -1})
+                fprintf('RT=%5.fms   subj_resp=%6s   is_resp_ok=%2d (%3d%%)\n',...
+                    -1,...
+                    0,...
+                    -1,...
+                    round(100*n_resp_ok / evt_trial) ...
+                    )
+                S.Window.AddFrameToMovie(evt_duration);
             end
 
         otherwise
@@ -183,7 +266,7 @@ switch S.guiACQmode
         n_volume = ceil((S.ENDtime-S.STARTtime)/TR);
         S.recKeylogger.GenerateMRITrigger(TR, n_volume, S.STARTtime)
 
-        UTILS.plotDelay(S.recPlanning, S.recEvent);
+        % UTILS.plotDelay(S.recPlanning, S.recEvent);
         % UTILS.plotStim(S.recPlanning, S.recEvent, S.recKeylogger);
 end
 S.recKeylogger.kb2data();
