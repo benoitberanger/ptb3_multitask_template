@@ -17,11 +17,11 @@ function plotDelay( planning , event )
 
 %% Check input data
 
-% Must be 2 input arguments, or try with the base workspace
+% Must be 2 input arguments
 assert(nargin == 2, '%s uses 2 input argument(s)', mfilename)
 
-assert( isa(planning,'UTILS.RECORDER.Planning'  ), 'planning must be an object of class UTILS.RECORDER.Planning'  )
-assert( isa(event    ,'UTILS.RECORDER.Event'    ), 'event must be an object of class UTILS.RECORDER.event'        )
+assert( isa(planning,'UTILS.RECORDER.Planning'), 'planning must be an object of class UTILS.RECORDER.Planning')
+assert( isa(event   ,'UTILS.RECORDER.Event'   ), 'event must be an object of class UTILS.RECORDER.event'      )
 
 
 %% How many events can we use ?
