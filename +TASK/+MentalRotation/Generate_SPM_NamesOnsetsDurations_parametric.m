@@ -102,6 +102,7 @@ end
 %% Debuging
 
 % UTILS.plotSPMnod(names, onsets, durations)
+% UTILS.plotSPMnod(names, onsets, durations, pmod)
 
 
 end % fcn

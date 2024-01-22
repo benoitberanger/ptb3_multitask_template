@@ -71,6 +71,13 @@ classdef (Abstract) Stim < UTILS.RECORDER.Cell
                 t0 = self.data( 1 , self.icol_onset );
             end
             time = cell2mat( self.data( : , self.icol_onset ) ); % Onsets of events
+            if isempty(time)
+                warning('no data ?')
+                if self.count == 0
+                    warning('no data : self.count=0')
+                    return
+                end
+            end
             self.data( : , self.icol_onset ) = num2cell( time - t0 );
         end % fcn
 
