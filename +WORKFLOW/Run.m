@@ -163,6 +163,16 @@ if exist(fullfile('+TASK',['+' S.guiTask],'Generate_SPM_NamesOnsetsDurations_blo
     end
 end
 
+if exist(fullfile('+TASK',['+' S.guiTask],'Generate_SPM_NamesOnsetsDurations_parametric.m'),'file')
+    [names, onsets, durations, pmod, tmod, orth] = TASK.(S.guiTask).Generate_SPM_NamesOnsetsDurations_parametric();
+
+    if S.WriteFiles
+        fpath_spm_parametric = [S.OutFilepath '_SPM_parametric.mat'];
+        save(fpath_spm_parametric, 'names', 'onsets', 'durations', 'pmod', 'tmod', 'orth'); % light weight file with only the onsets for SPM
+        logger.log('saved SPM parametric file : %s', fpath_spm_parametric)
+    end
+end
+
 
 %% Ready for another run
 

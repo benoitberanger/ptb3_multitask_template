@@ -288,7 +288,7 @@ for evt = 1 : S.recPlanning.count
         S.recEvent.AddEnd(S.ENDtime - S.STARTtime);
         S.recEvent.ClearEmptyLines();
 
-        S.recEvent.ClearEmptyLines();
+        S.recBehaviour.ClearEmptyLines();
 
         if S.WriteFiles
             save([S.OutFilepath '_ABORT_at_runtime.mat'], 'S')
