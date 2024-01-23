@@ -183,7 +183,7 @@ for i = 1 : length(tasklist)
     task_dispatcher.next();
     taskname = tasklist{i};
     uiname = sprintf('pushbutton_task_%s', taskname);
-    handles.(uiname) = uicontrol(where, base_cfg_pushbutton{:}, 'Position',task_dispatcher.pos(), 'String',taskname, 'Callback', @WORKFLOW.Run);
+    handles.(uiname) = uicontrol(where, base_cfg_pushbutton{:}, 'Position',task_dispatcher.pos(), 'String',taskname, 'Callback', @GUI.Workflow);
 end
 
 

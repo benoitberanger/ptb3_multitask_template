@@ -110,6 +110,7 @@ for ireg = 1 : length(graph_data) % For each regressor
         if graph_data(ireg).has_pmod
             data(pts*n+1,3:end) = all_mudulators(n,:);
             data(pts*n+2,3:end) = NaN;
+            data(pts*n+3,3:end) = NaN;
         end
 
         % +1 invisible point between events

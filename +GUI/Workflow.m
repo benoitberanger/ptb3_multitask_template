@@ -1,4 +1,4 @@
-function Run( hObject, ~ )
+function Workflow( hObject, ~ )
 % Here is the main workflow, where everythging happens
 % --- in the GUI, click on task button
 % - Retrieve GUI parameters

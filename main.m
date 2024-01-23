@@ -23,6 +23,6 @@ UTILS.CheckRequirements()
 CONFIG.PrintReminder()
 GUI.Open() % the GUI is the **ONLY** interface the user will interact with
 
-% The workflow is here : WORKFLOW.Run()
+% The workflow is here : GUI.Workflow()
 
 end % function
