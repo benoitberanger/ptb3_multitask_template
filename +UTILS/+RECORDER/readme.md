@@ -9,3 +9,8 @@ Classes in _italic_ are 'virtual' and should not be instanciated, except for deb
             - **Event** : register the events from **Planning** but with their real onset and duration, for later diagnostic
             - **Keylogger** : log all key pressed, including MRI trigger (in parallel to the task execution)
 
+# Utils
+```matlab
+UTILS.plotDelay( planning , event )
+UTILS.plotStim( planning , event , keylogger )
+```
