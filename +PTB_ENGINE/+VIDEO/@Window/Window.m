@@ -105,7 +105,7 @@ classdef Window < handle
             % Warmup
             Screen('Flip', self.ptr);
 
-            logger.log('PTB window & rendring paramters set')
+            logger.log('PTB window & rendering parameters set')
 
             if self.is_recorded
                 self.CreateMovie()

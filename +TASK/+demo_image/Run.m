@@ -11,9 +11,6 @@ img_no_transparency  = fullfile(image_path,'face_no-transparency.jpg');
 img_with_tranparency = fullfile(image_path,'face_with-transparency.png');
 
 
-%% keymap
-
-
 %% start PTB engine
 
 Window = PTB_ENGINE.VIDEO.Window();
@@ -23,18 +20,41 @@ Window.Open();
 
 %% prepare rendering object
 
-ImageTransparency = PTB_OBJECT.VIDEO.Image();
-ImageTransparency.window = Window;
-ImageTransparency.filename = img_with_tranparency;
-ImageTransparency.Load();
-% ImageTransparency.Plot()
+ImageWithTransparency = PTB_OBJECT.VIDEO.Image();
+ImageWithTransparency.window = Window;
+ImageWithTransparency.filename = img_with_tranparency;
+ImageWithTransparency.Load();
+% ImageWithTransparency.Plot()
+ImageWithTransparency.MakeTexture();
+
+ImageNoTransparency = PTB_OBJECT.VIDEO.Image();
+ImageNoTransparency.window = Window;
+ImageNoTransparency.filename = img_no_transparency;
+ImageNoTransparency.Load();
+% ImageNoTransparency.Plot()
+ImageNoTransparency.MakeTexture();
 
 
-%% End
+%% demo runtime
 
-WaitSecs(0.1);
+ImageWithTransparency.ScaleToMax();
+ImageWithTransparency.Move(Window.size_x*0.25, Window.size_y*0.50);
+ImageWithTransparency.Draw();
+
+ImageNoTransparency.ScaleToMax();
+ImageNoTransparency.Move(Window.size_x*0.75, Window.size_y*0.50);
+ImageNoTransparency.Draw();
+
+Window.Flip();
+
+
+%% END
+
+
+ImageWithTransparency.Close();
+ImageNoTransparency.Close();
 logger.warn('Press any key to Exit...');
-% KbWait();
+KbWait();
 Window.Close();
 
 
