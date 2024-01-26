@@ -258,19 +258,23 @@ S.Window.Close();
 S.recEvent.ComputeDurations();
 S.recKeylogger.GetQueue();
 S.recKeylogger.Stop();
+S.recKeylogger.kb2data();
 switch S.guiACQmode
     case 'Acquisition'
     case {'Debug', 'FastDebug'}
         TR = CONFIG.TR();
         n_volume = ceil((S.ENDtime-S.STARTtime)/TR);
         S.recKeylogger.GenerateMRITrigger(TR, n_volume, S.STARTtime)
+end
+S.recKeylogger.ScaleTime(S.STARTtime);
+assignin('base', 'S', S)
 
+switch S.guiACQmode
+    case 'Acquisition'
+    case {'Debug', 'FastDebug'}
         % UTILS.plotDelay(S.recPlanning, S.recEvent);
         % UTILS.plotStim(S.recPlanning, S.recEvent, S.recKeylogger);
 end
-S.recKeylogger.kb2data();
-S.recKeylogger.ScaleTime(S.STARTtime);
-assignin('base', 'S', S)
 
 
 end % fcn
