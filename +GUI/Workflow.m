@@ -67,10 +67,10 @@ S.SubjectDataDir = UTILS.GET.SubjectDataDir(S.guiSubjectID);
 
 %% Generate base output filepath
 
-basename_norun = sprintf('%s_%s', S.guiSubjectID, S.guiTask );
+basename_norun = sprintf('%s__%s', S.guiSubjectID, S.guiTask );
 [S.RunName, S.RunNumber] = UTILS.AppendRunNumber(S.SubjectDataDir, basename_norun);
 
-S.OutFilename    = sprintf('%s_%s', S.TimeStampFile, S.RunName);
+S.OutFilename    = sprintf('%s__%s', S.TimeStampFile, S.RunName);
 S.OutFilepath    = fullfile(S.SubjectDataDir, S.OutFilename);
 logger.log('Output file name  = %s', S.OutFilename)
 
@@ -145,7 +145,7 @@ end
 %% Save data 'raw' data immediatly
 
 if S.WriteFiles
-    fpath_raw = [S.OutFilepath '_RAW.mat'];
+    fpath_raw = [S.OutFilepath '__RAW.mat'];
     save(fpath_raw, 'S')
     logger.log('saved RAW file : %s', fpath_raw)
 end
@@ -157,7 +157,7 @@ if exist(fullfile('+TASK',['+' S.guiTask],'Generate_SPM_NamesOnsetsDurations_blo
     [names, onsets, durations] = TASK.(S.guiTask).Generate_SPM_NamesOnsetsDurations_block();
 
     if S.WriteFiles
-        fpath_spm_block = [S.OutFilepath '_SPM_block.mat'];
+        fpath_spm_block = [S.OutFilepath '__SPM_block.mat'];
         save(fpath_spm_block, 'names', 'onsets', 'durations'); % light weight file with only the onsets for SPM
         logger.log('saved SPM `block` file : %s', fpath_spm_block)
     end
@@ -167,7 +167,7 @@ if exist(fullfile('+TASK',['+' S.guiTask],'Generate_SPM_NamesOnsetsDurations_par
     [names, onsets, durations, pmod, tmod, orth] = TASK.(S.guiTask).Generate_SPM_NamesOnsetsDurations_parametric();
 
     if S.WriteFiles
-        fpath_spm_parametric = [S.OutFilepath '_SPM_parametric.mat'];
+        fpath_spm_parametric = [S.OutFilepath '__SPM_parametric.mat'];
         save(fpath_spm_parametric, 'names', 'onsets', 'durations', 'pmod', 'tmod', 'orth'); % light weight file with only the onsets for SPM
         logger.log('saved SPM parametric file : %s', fpath_spm_parametric)
     end

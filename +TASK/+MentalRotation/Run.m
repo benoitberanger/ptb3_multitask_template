@@ -240,7 +240,7 @@ for evt = 1 : S.recPlanning.count
         S.recBehaviour.ClearEmptyLines();
 
         if S.WriteFiles
-            save([S.OutFilepath '_ABORT_at_runtime.mat'], 'S')
+            save([S.OutFilepath '__ABORT_at_runtime.mat'], 'S')
         end
 
         fprintf('!!! @%s : Abort key received !!!\n', mfilename)

@@ -16,7 +16,7 @@ status = Eyelink('StartRecording');
 logger.assert(status==0,'StartRecording error, startrecording_error : %d ',status)
 
 % Write a minifile to remember what is the eyelink 8 char fname
-S.EyelinkFileRemember = [S.OutFilepath '_EyelinkFilename.txt'];
+S.EyelinkFileRemember = [S.OutFilepath '__EyelinkFilename.txt'];
 fid = fopen(S.EyelinkFileRemember, 'w', 'native', 'UTF-8');
 logger.assert(fid>0, 'File could not be openned : %s', S.EyelinkFileRemember)
 fprintf(fid, S.EyelinkFile);
