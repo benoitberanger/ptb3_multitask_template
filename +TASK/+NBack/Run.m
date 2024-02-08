@@ -294,6 +294,8 @@ for evt = 1 : S.recPlanning.count
             save([S.OutFilepath '__ABORT_at_runtime.mat'], 'S')
         end
 
+        PTB_ENGINE.END();
+
         fprintf('!!! @%s : Abort key received !!!\n', mfilename)
         break % stop the forloop:evt
 
