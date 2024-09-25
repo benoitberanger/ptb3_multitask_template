@@ -59,6 +59,11 @@ S.Window.is_recorded    = S.guiRecordMovie;
 S.Window.Open();
 
 
+%% Prepare external sensor recorder
+
+S.recSensor = UTILS.RECORDER.Double({'time', 'target', 'sensor'}, round(S.recPlanning.data{end, S.recPlanning.Get('onset')} * S.Window.fps * 1.2));
+
+
 %% prepare rendering object
 
 FixationCross          = PTB_OBJECT.VIDEO.FixationCross();
@@ -129,6 +134,7 @@ for evt = 1 : S.recPlanning.count
             FixationCross.Draw();
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
+            S.recSensor.AddLine([real_onset-S.STARTtime, rand, rand]);
 
             fprintf('Rest : %gs \n', evt_duration)
             S.Window.AddFrameToMovie(evt_duration);
@@ -148,6 +154,7 @@ for evt = 1 : S.recPlanning.count
             TextInstruction.Draw(content);
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
+            S.recSensor.AddLine([real_onset-S.STARTtime, rand, rand]);
 
             fprintf('Instruction : %gs --- %s \n', evt_duration, content);
             S.Window.AddFrameToMovie(evt_duration);
@@ -168,6 +175,7 @@ for evt = 1 : S.recPlanning.count
 
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
+            S.recSensor.AddLine([real_onset-S.STARTtime, rand, rand]);
             S.Window.AddFrameToMovie(evt_duration);
 
             if skip_delay_check_catch
@@ -228,6 +236,7 @@ for evt = 1 : S.recPlanning.count
             TextStim.Draw(content);
             stim_real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, stim_real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
+            S.recSensor.AddLine([real_onset-S.STARTtime, rand, rand]);
             S.Window.AddFrameToMovie(evt_duration);
 
             itrial  = S.recPlanning.data{evt,icol_trial  };
@@ -289,6 +298,7 @@ for evt = 1 : S.recPlanning.count
         S.recEvent.ClearEmptyLines();
 
         S.recBehaviour.ClearEmptyLines();
+        S.recSensor.ClearEmptyLines();
 
         if S.WriteFiles
             save([S.OutFilepath '__ABORT_at_runtime.mat'], 'S')
@@ -320,6 +330,7 @@ switch S.guiACQmode
         S.recKeylogger.GenerateMRITrigger(TR, n_volume, S.STARTtime)
 end
 S.recKeylogger.ScaleTime(S.STARTtime);
+S.recSensor.ClearEmptyLines();
 assignin('base', 'S', S)
 
 switch S.guiACQmode
