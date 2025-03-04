@@ -29,6 +29,7 @@ S.ProjectRootDir  = UTILS.GET.RootDir();
 S.ProjectDataDir  = UTILS.GET.DataDir();
 S.TimeStampSimple = datestr(now, 'yyyy-mm-dd HH:MM:SS'); % readable
 S.TimeStampFile   = datestr(now, 'yyyymmddTHHMMSS'    ); % to sort automatically files by time of creation
+S.GitInfo         = UTILS.GET.GitInfo();
 
 
 %% Lots of get*
