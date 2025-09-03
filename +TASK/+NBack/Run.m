@@ -80,7 +80,7 @@ TextInstruction.window = Window;
 TextInstruction.color  = S.cfgFixationCross.Color;
 TextInstruction.size   = 0.10;
 
-TextStim      = TextInstruction.CopyObject();
+TextStim      = TextInstruction.copy();
 TextStim.size = 0.20;
 
 

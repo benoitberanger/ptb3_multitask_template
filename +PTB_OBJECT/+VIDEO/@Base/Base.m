@@ -1,4 +1,4 @@
-classdef Base < handle
+classdef Base < handle & matlab.mixin.Copyable
     % BASE is a 'virtual' class : all subclasses contain this virtual class methods and attributes
 
     properties(GetAccess = public, SetAccess = public)
@@ -10,16 +10,6 @@ classdef Base < handle
         %------------------------------------------------------------------
         function self = Base()
             % pass
-        end % fcn
-
-        %------------------------------------------------------------------
-        function newObject = CopyObject( self )
-            className = class( self );
-            propOfClass = properties( self );
-            newObject = eval(className);
-            for p = 1 : length(propOfClass)
-                newObject.(propOfClass{p}) = self.(propOfClass{p});
-            end
         end % fcn
 
         %------------------------------------------------------------------
