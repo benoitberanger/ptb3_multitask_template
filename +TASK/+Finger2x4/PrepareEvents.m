@@ -13,7 +13,7 @@ cfgEvents = struct; % This structure will contain task specific parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Design
 
-cfgEvents.nBlock = 5;
+cfgEvents.nBlock = 10;
 
 
 %% Timings
@@ -21,7 +21,7 @@ cfgEvents.nBlock = 5;
 % all in seconds
 cfgEvents.durBreak  = 00.500;
 cfgEvents.durRest   = 10.000;
-cfgEvents.durMaxCue = 05.000;
+cfgEvents.durMaxCue = 04.000;
 
 
 %% Debugging
@@ -32,7 +32,6 @@ switch ACQmode
     case {'Debug','FastDebug'}
         cfgEvents.nBlock    = 1;
         cfgEvents.durRest   = 02.000;
-        cfgEvents.durMaxCue = 02.000;
     otherwise
         error('mode ?')
 end
@@ -87,7 +86,7 @@ for iBlock = 1 : cfgEvents.nBlock
     current_block = Shuffle(block,2);
     for iStim = 1 : size(block,1)
         iTrial = iTrial + 1;
-        planning.AddStim('Cue'  ,planning.GetNextOnset(),                  1, {iTrial, iBlock, iStim, current_block(iStim,:)})
+        planning.AddStim('Cue'  ,planning.GetNextOnset(),                1.5, {iTrial, iBlock, iStim, current_block(iStim,:)})
         planning.AddStim('Break',planning.GetNextOnset(), cfgEvents.durBreak)
     end
     planning.AddStim('Rest' ,planning.GetNextOnset(), cfgEvents.durRest)

@@ -156,6 +156,8 @@ for evt = 1 : S.recPlanning.count
             ButtonBox4C_L.Draw(button_L);
             ButtonBox4C_R.Draw(button_R);
             real_onset = Window.Flip();
+            cue_onset = real_onset;
+            RT = 0;
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
             S.Window.AddFrameToMovie(evt_duration);
 
@@ -180,6 +182,7 @@ for evt = 1 : S.recPlanning.count
                     if EXIT, break, end
 
                     if keyCode(keyCode_L(button_L)) && keyCode(keyCode_R(button_R))
+                        RT = secs - cue_onset;
                         resp_ok = true;
                         n_ok = n_ok + 1;
                         break
@@ -188,7 +191,8 @@ for evt = 1 : S.recPlanning.count
                 end
             end % while
 
-            fprintf('resp_ok=%1d (%3d%%) \n', ...
+            fprintf('RT=%5.fms  resp_ok=%1d (%3d%%) \n', ...
+                round(RT * 1000),...
                 resp_ok,...
                 round(100*n_ok/itrial) ...
                 )
