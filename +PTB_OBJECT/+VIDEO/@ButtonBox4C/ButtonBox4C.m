@@ -3,31 +3,36 @@ classdef ButtonBox4C < PTB_OBJECT.VIDEO.Base
 
     properties(GetAccess = public, SetAccess = public)
         % User accessible paramters :
-        dim           (1,1) double % ratio from window_size_y, from 0 to 1
-        color_plastic (1,4) uint8  % [R G B a] from 0 to 255
-        color_border  (1,4) uint8  % [R G B a] from 0 to 255
-        color_cable   (1,4) uint8  % [R G B a] from 0 to 255
     end % props
 
     properties(GetAccess = public, SetAccess = protected)
         % Internal parameters :
+
+        % [R G B a] from 0 to 255
+        color_plastic  (1,4) uint8 = [128 128 128 255]
+        color_border   (1,4) uint8 = [150 150 150 255]
+        color_cable    (1,4) uint8 = [020 020 020 255]
+
+        % [R G B] from 0 to 255 -> alpha chanel managed by the code
+        color_1        (1,3) uint8 = [000 080 255]
+        color_2        (1,3) uint8 = [255 230 000]
+        color_3        (1,3) uint8 = [000 180 000]
+        color_4        (1,3) uint8 = [255 000 000]
+
+        % pre-calculated coordinates of the cross for PTB, in pixels
+        
         dim_px         (1,1) double
         center_x_px    (1,1) double
         center_y_px    (1,1) double
 
-        coord_plastic  (1,4) double % pre-calculated coordinates of the cross for PTB, in pixels
+        coord_plastic  (1,4) double
         width_border   (1,1) double
         coord_cable    (1,4) double
-
-        color_1 (1,3) uint8 = [000 080 255] % [R G B] from 0 to 255 -> alpha chanel managed by the code
-        color_2 (1,3) uint8 = [255 230 000] % [R G B] from 0 to 255 -> alpha chanel managed by the code
-        color_3 (1,3) uint8 = [000 180 000] % [R G B] from 0 to 255 -> alpha chanel managed by the code
-        color_4 (1,3) uint8 = [255 000 000] % [R G B] from 0 to 255 -> alpha chanel managed by the code
-
-        coord_1 (1,4) double
-        coord_2 (1,4) double
-        coord_3 (1,4) double
-        coord_4 (1,4) double
+       
+        coord_1        (1,4) double
+        coord_2        (1,4) double
+        coord_3        (1,4) double
+        coord_4        (1,4) double
 
     end % props
 
@@ -41,16 +46,19 @@ classdef ButtonBox4C < PTB_OBJECT.VIDEO.Base
         %------------------------------------------------------------------
         function Prepare(self, side)
 
-            self.dim_px = self.dim * self.window.size_y;
+            % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            % SCALING PARAMETERS ARE HERE
+            self.dim_px = 0.8 * self.window.size_y;
             d = self.dim_px; % shortcut
 
             self.width_border = 0.02 * d;
 
             rect_plastic = [0 0 1.00 0.50] * d;
-            rect_cable   = [0 0 0.20 0.03] * d;
+            rect_cable   = [0 0 0.05 0.03] * d;
 
             spacing = d/5;
             rect_button = [0 0 1 1] * 0.80 * spacing;
+            % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             switch side
                 case 'Left'

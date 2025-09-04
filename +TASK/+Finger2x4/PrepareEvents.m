@@ -19,9 +19,9 @@ cfgEvents.nBlock = 5;
 %% Timings
 
 % all in seconds
-cfgEvents.durTap      = 00.500;
-cfgEvents.durRest     = 10.000;
-cfgEvents.durMaxQueue = 05.000;
+cfgEvents.durBreak  = 00.500;
+cfgEvents.durRest   = 10.000;
+cfgEvents.durMaxCue = 05.000;
 
 
 %% Debugging
@@ -30,9 +30,9 @@ switch ACQmode
     case 'Acquisition'
         % pass
     case {'Debug','FastDebug'}
-        cfgEvents.nBlock = 1;
-        cfgEvents.durRest     = 02.000;
-        cfgEvents.durMaxQueue = 02.000;
+        cfgEvents.nBlock    = 1;
+        cfgEvents.durRest   = 02.000;
+        cfgEvents.durMaxCue = 02.000;
     otherwise
         error('mode ?')
 end
@@ -87,8 +87,8 @@ for iBlock = 1 : cfgEvents.nBlock
     current_block = Shuffle(block,2);
     for iStim = 1 : size(block,1)
         iTrial = iTrial + 1;
-        planning.AddStim('Queue',planning.GetNextOnset(),                1, {iTrial, iBlock, iStim, current_block(iStim,:)})
-        planning.AddStim('Tap'  ,planning.GetNextOnset(), cfgEvents.durTap)
+        planning.AddStim('Cue'  ,planning.GetNextOnset(),                  1, {iTrial, iBlock, iStim, current_block(iStim,:)})
+        planning.AddStim('Break',planning.GetNextOnset(), cfgEvents.durBreak)
     end
     planning.AddStim('Rest' ,planning.GetNextOnset(), cfgEvents.durRest)
 end

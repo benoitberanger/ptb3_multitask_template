@@ -14,8 +14,8 @@ names = {
     'R3'
     'R4'
     'Rest'
-    'Queue'
-    'Tap'
+    'Cue'   % instruction, showing which finger to tap
+    'Break' % all button transparent, mini rest time
     };
 
 % 'onsets' & 'durations' for SPM
@@ -69,7 +69,7 @@ end
 
 %% Debuging
 
-% UTILS.plotSPMnod(names, onsets, durations)
+UTILS.plotSPMnod(names, onsets, durations)
 
 
 end % fcn

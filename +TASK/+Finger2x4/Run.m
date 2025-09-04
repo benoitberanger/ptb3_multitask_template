@@ -84,10 +84,6 @@ FixationCross.GenerateCoords();
 
 ButtonBox4C_L = PTB_OBJECT.VIDEO.ButtonBox4C();
 ButtonBox4C_L.window = Window;
-ButtonBox4C_L.dim = 0.5;
-ButtonBox4C_L.color_plastic = [128 128 128 255];
-ButtonBox4C_L.color_border  = [150 150 150 255];
-ButtonBox4C_L.color_cable   = [020 020 020 255];
 ButtonBox4C_L.Prepare('Left');
 
 ButtonBox4C_R = ButtonBox4C_L.copy();
@@ -152,8 +148,9 @@ for evt = 1 : S.recPlanning.count
                 end
             end
 
-        case 'Queue'
+        case 'Cue'
 
+            FixationCross.Draw();
             button_L = find(content(4:-1:1));
             button_R = find(content(5:8));
             ButtonBox4C_L.Draw(button_L);
@@ -174,7 +171,7 @@ for evt = 1 : S.recPlanning.count
                 )
 
             % While loop for most of the duration of the event, so we can press ESCAPE
-            next_onset = real_onset + S.cfgEvents.durMaxQueue - Window.slack;
+            next_onset = real_onset + S.cfgEvents.durMaxCue - Window.slack;
             while secs < next_onset
                 [keyIsDown, secs, keyCode] = KbCheck();
                 if keyIsDown
@@ -197,8 +194,9 @@ for evt = 1 : S.recPlanning.count
                 )
             resp_ok = false;
 
-        case 'Tap'
-
+        case 'Break'
+            
+            FixationCross.Draw();
             ButtonBox4C_L.Draw();
             ButtonBox4C_R.Draw();
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
@@ -206,7 +204,7 @@ for evt = 1 : S.recPlanning.count
             S.Window.AddFrameToMovie(evt_duration);
 
             % While loop for most of the duration of the event, so we can press ESCAPE
-            next_onset = real_onset + S.cfgEvents.durTap - Window.slack;
+            next_onset = real_onset + S.cfgEvents.durBreak - Window.slack;
             while secs < next_onset
                 [keyIsDown, secs, keyCode] = KbCheck();
                 if keyIsDown
