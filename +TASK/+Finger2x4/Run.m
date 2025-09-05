@@ -133,6 +133,8 @@ for evt = 1 : S.recPlanning.count
         case 'Rest'
 
             FixationCross.Draw();
+            ButtonBox4C_L.Draw();
+            ButtonBox4C_R.Draw();
             real_onset = Window.Flip();
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
 
@@ -199,10 +201,10 @@ for evt = 1 : S.recPlanning.count
             resp_ok = false;
 
         case 'Break'
-            
+
             FixationCross.Draw();
-            ButtonBox4C_L.Draw();
-            ButtonBox4C_R.Draw();
+            ButtonBox4C_L.Draw(0);
+            ButtonBox4C_R.Draw(0);
             real_onset = Window.Flip(S.STARTtime + evt_onset - Window.slack);
             S.recEvent.AddStim(evt_name, real_onset-S.STARTtime, [], S.recPlanning.data(evt,S.recPlanning.icol_data:end));
             S.Window.AddFrameToMovie(evt_duration);

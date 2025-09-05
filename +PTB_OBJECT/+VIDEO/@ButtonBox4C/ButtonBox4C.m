@@ -20,7 +20,7 @@ classdef ButtonBox4C < PTB_OBJECT.VIDEO.Base
         color_4        (1,3) uint8 = [255 000 000]
 
         % pre-calculated coordinates of the cross for PTB, in pixels
-        
+
         dim_px         (1,1) double
         center_x_px    (1,1) double
         center_y_px    (1,1) double
@@ -28,7 +28,7 @@ classdef ButtonBox4C < PTB_OBJECT.VIDEO.Base
         coord_plastic  (1,4) double
         width_border   (1,1) double
         coord_cable    (1,4) double
-       
+
         coord_1        (1,4) double
         coord_2        (1,4) double
         coord_3        (1,4) double
@@ -93,24 +93,29 @@ classdef ButtonBox4C < PTB_OBJECT.VIDEO.Base
             Screen('FrameRect', self.window.ptr, self.color_border , self.coord_plastic, self.width_border);
             Screen('FillRect' , self.window.ptr, self.color_cable  , self.coord_cable);
 
-            Screen('FillOval' , self.window.ptr,  [self.color_1 030], self.coord_1);
-            Screen('FillOval' , self.window.ptr,  [self.color_2 030], self.coord_2);
-            Screen('FillOval' , self.window.ptr,  [self.color_3 030], self.coord_3);
-            Screen('FillOval' , self.window.ptr,  [self.color_4 030], self.coord_4);
-
             if nargin > 1
-                if     button == 1, Screen('FillOval' , self.window.ptr,  [self.color_1 255], self.coord_1);
-                elseif button == 2, Screen('FillOval' , self.window.ptr,  [self.color_2 255], self.coord_2);
-                elseif button == 3, Screen('FillOval' , self.window.ptr,  [self.color_3 255], self.coord_3);
-                elseif button == 4, Screen('FillOval' , self.window.ptr,  [self.color_4 255], self.coord_4);
-                else, error('!')
+
+                Screen('FillOval' , self.window.ptr,  [self.color_1 030], self.coord_1);
+                Screen('FillOval' , self.window.ptr,  [self.color_2 030], self.coord_2);
+                Screen('FillOval' , self.window.ptr,  [self.color_3 030], self.coord_3);
+                Screen('FillOval' , self.window.ptr,  [self.color_4 030], self.coord_4);
+
+                if button > 0
+                    if     button == 1, Screen('FillOval' , self.window.ptr,  [self.color_1 255], self.coord_1);
+                    elseif button == 2, Screen('FillOval' , self.window.ptr,  [self.color_2 255], self.coord_2);
+                    elseif button == 3, Screen('FillOval' , self.window.ptr,  [self.color_3 255], self.coord_3);
+                    elseif button == 4, Screen('FillOval' , self.window.ptr,  [self.color_4 255], self.coord_4);
+                    else, error('!')
+                    end
                 end
+
+                Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_1);
+                Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_2);
+                Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_3);
+                Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_4);
+
             end
 
-            Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_1);
-            Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_2);
-            Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_3);
-            Screen('FrameOval', self.window.ptr,  [000 000 000  255], self.coord_4);
         end % fcn
 
     end % meths
